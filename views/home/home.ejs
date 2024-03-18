@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>JMJ Music House</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="/assets/imgs/theme/favicon.svg">
+    <!-- Template CSS -->
+    <link rel="stylesheet" href="/assets/css/main.css?v=3.4">
+</head>
+
+<body>
+    <!-- Quick view -->
+    <%- include('./partials/home/quick-view-modal.ejs') %>
+
+    <!-- Header -->
+    <%- include('./partials/home/home-header.ejs', {currTab: 'home'}) %>
+
+    <!-- Mobile Header -->
+    <%- include('./partials/home/home-mobile-header.ejs', {currTab: 'home'}) %>
+    
+    <main class="main">
+        <section class="home-slider position-relative pt-25 pb-20">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="position-relative">
+                            <div class="hero-slider-1 style-3 dot-style-1 dot-style-1-position-1">
+                                <% if (locals.banners) { %>
+                                <% if (banners.length > 1) { %>
+                                    <% for( let i = 0; i < banners.length-1; i++ ) { %>                                
+                                        <% if (banners[i]?.isActive) { %>
+                                        <div class="single-hero-slider single-animation-wrap">
+                                            <div class="container">
+                                                <div class="slider-1-height-3 slider-animated-1">
+                                                    <div class="hero-slider-content-2">
+                                                        <!-- <h4 class="animated"><%= banners[i]?.title %></h4> -->
+                                                        <h2 class="animated fw-900 text-white"><%= banners[i]?.title %></h2>
+                                                        <!-- <h1 class="animated fw-900 text-brand">On All Products</h1> -->
+                                                        <p class="animated text-white"><%= banners[i]?.description %></p>
+                                                        <a class="animated btn btn-brush btn-brush-3 text-white" href="<%= banners[i]?.link %>"> Shop Now </a>
+                                                    </div>
+                                                    <div class="slider-img ">
+                                                        <img style="width: 100%;" src="/img/banners/<%= banners[i]?.image %>" alt="">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <% } %>
+                                    <% } %>
+                                <% } %>
+                                <% } %>
+                                <!-- <div class="single-hero-slider single-animation-wrap">
+                                    <div class="container">
+                                        <div class="slider-1-height-3 slider-animated-1">
+                                            <div class="hero-slider-content-2">
+                                                <h4 class="animated">Tech Promotions</h4>
+                                                <h2 class="animated fw-900">Tech Trending</h2>
+                                                <h1 class="animated fw-900 text-brand">Great Collection</h1>
+                                                <p class="animated">Save more with coupons & up to 20% off</p>
+                                                <a class="animated btn btn-brush btn-brush-3" href="shop-product-right.html"> Shop Now </a>
+                                            </div>
+                                            <div class="slider-img">
+                                                <img src="/assets/imgs/slider/slider-5.png" alt="">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div> -->
+                            </div>
+                            <div class="slider-arrow hero-slider-1-arrow style-3"></div>
+                        </div>
+                    </div>
+                    <!-- <div class="col-lg-3 d-md-none d-lg-block">
+                        <div class="banner-img banner-1 wow fadeIn  animated home-3">
+                            <img class="border-radius-10" src="/assets/imgs/banner/banner-5.jpg" alt="">
+                            <div class="banner-text">
+                                <span>Accessories</span>
+                                <h4>Save 17% on <br>Autumn Hat</h4>
+                                <a href="shop-grid-right.html">Shop Now <i class="fi-rs-arrow-right"></i></a>
+                            </div>
+                        </div>
+                        <div class="banner-img banner-2 wow fadeIn  animated mb-0">
+                            <img class="border-radius-10" src="/assets/imgs/banner/banner-7.jpg" alt="">
+                            <div class="banner-text">
+                                <span>Smart Offer</span>
+                                <h4>Save 20% on <br>Eardrop</h4>
+                                <a href="shop-grid-right.html">Shop Now <i class="fi-rs-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div> -->
+                </div>
+            </div>
+        </section>
+        <section class="product-tabs section-padding wow fadeIn animated">
+            <div class="container">
+                <div class="tab-header">
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="nav-tab-one" data-bs-toggle="tab" data-bs-target="#tab-one" type="button" role="tab" aria-controls="tab-one" aria-selected="true">Featured</button>
+                        </li>
+                    </ul>
+                    <a href="/search" class="view-more d-none d-md-flex">View More<i class="fi-rs-angle-double-small-right"></i></a>
+                </div>
+                <!--End nav-tabs-->
+                <div class="tab-content wow fadeIn animated" id="myTabContent">
+                    <div class="tab-pane fade show active" id="tab-one" role="tabpanel" aria-labelledby="tab-one">
+                        <div class="row product-grid-4">
+                            <% if (locals.featuredProds) { %>
+                                <% for( let i = 0; i < featuredProds.length; i++ ) { %>
+                                    <div class="col-lg-3 col-md-4 col-12 col-sm-6">
+                                        <div class="product-cart-wrap mb-30">
+                                            <div class="product-img-action-wrap">
+                                                <div class="product-img product-img-zoom">
+                                                    <a href="/<%= featuredProds[i]?.category.toLowerCase() %>/<%= featuredProds[i]?._id %>">
+                                                        <img class="default-img" src="/img/products/<%= featuredProds[i]?.images[0] %>" alt="<%= featuredProds[i]?.productName %>">
+                                                        <img class="hover-img" src="/img/products/<%= featuredProds[i]?.images[0] %>" alt="<%= featuredProds[i]?.productName %>">
+                                                    </a>
+                                                </div>
+                                                <div class="product-action-1">
+                                                    <!-- <a aria-label="Quick view" class="action-btn hover-up" data-bs-toggle="modal" 
+                                                        data-bs-target="#quickViewModal" 
+                                                        data-productname="<%= featuredProds[i]?.productName %>"
+                                                        data-img="/img/products/<%= featuredProds[i]?.images[0] %>"
+                                                        data-category="<%= featuredProds[i]?.category %>"
+                                                        data-saleprice="<%= featuredProds[i]?.salePrice %>"
+                                                        data-regularprice="<%= featuredProds[i]?.regularPrice %>"
+                                                        data-productid="<%= featuredProds[i]?._id %>"
+                                                        >
+                                                        <i class="fi-rs-eye"></i>
+                                                    </a> -->
+                                                    <a aria-label="Add To Wishlist" onclick="addToWishlist('<%= featuredProds[i]?._id %>')" class="action-btn hover-up"><i class="fi-rs-heart"></i></a>
+                                                </div>
+                                                <div class="product-badges product-badges-position product-badges-mrg">
+                                                    <span class="hot">Hot</span>
+                                                </div>
+                                            </div>
+                                            <div class="product-content-wrap">
+                                                <div class="product-category">
+                                                    <a href="/<%= featuredProds[i]?.category.toLowerCase() %>"><%= featuredProds[i]?.category %></a>
+                                                </div>
+                                                <h2><a href="/<%= featuredProds[i]?.category.toLowerCase() %>/<%= featuredProds[i]?._id %>"><%= featuredProds[i]?.productName %></a></h2>
+                                                <div class="rating-result" title="90%">
+                                                    <span>
+                                                        <span>90%</span>
+                                                    </span>
+                                                </div>
+                                                <div class="product-price">
+                                                    <span>₹<%= featuredProds[i]?.salePrice %></span>
+                                                    <span class="old-price">₹<%= featuredProds[i]?.regularPrice %></span>
+                                                </div>
+                                                <div class="product-action-1 show">
+                                                    <a aria-label="Add To Cart" onclick="addToCart('<%= featuredProds[i]?._id %>')" class="action-btn hover-up"><i class="fi-rs-shopping-bag-add"></i></a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% } %>
+                            <% } %>
+                        </div>
+                        <!--End product-grid-4-->
+                    </div>
+                    <!--En tab one (Featured)-->
+
+                    <!-- <div class="tab-pane fade" id="tab-two" role="tabpanel" aria-labelledby="tab-two"> 
+                         <div class="row product-grid-4">
+                            <% if (locals.featuredProds) { %>
+                                <% for( let i = 0; i < featuredProds.length; i++ ) { %>
+                                    <div class="col-lg-3 col-md-4 col-12 col-sm-6">
+                                        <div class="product-cart-wrap mb-30">
+                                            <div class="product-img-action-wrap">
+                                                <div class="product-img product-img-zoom">
+                                                    <a href="/<%= featuredProds[i]?.category.toLowerCase() %>/<%= featuredProds[i]?._id %>">
+                                                        <img class="default-img" src="/img/featuredProds/<%= featuredProds[i]?.images[0] %>" alt="<%= featuredProds[i]?.productName %>">
+                                                        <img class="hover-img" src="/img/featuredProds/<%= featuredProds[i]?.images[0] %>" alt="<%= featuredProds[i]?.productName %>">
+                                                    </a>
+                                                </div>
+                                                <div class="product-action-1">
+                                                    <a aria-label="Quick view" class="action-btn hover-up" data-bs-toggle="modal" data-bs-target="#quickViewModal"><i class="fi-rs-eye"></i></a>
+                                                    <a aria-label="Add To Wishlist" class="action-btn hover-up" href="#"><i class="fi-rs-heart"></i></a>
+                                                </div>
+                                                <div class="product-badges product-badges-position product-badges-mrg">
+                                                    <span class="hot">Hot</span>
+                                                </div>
+                                            </div>
+                                            <div class="product-content-wrap">
+                                                <div class="product-category">
+                                                    <a href="/<%= featuredProds[i]?.category.toLowerCase() %>"><%= featuredProds[i]?.category %></a>
+                                                </div>
+                                                <h2><a href="/<%= featuredProds[i]?.category.toLowerCase() %>/<%= featuredProds[i]?._id %>"><%= featuredProds[i]?.productName %></a></h2>
+                                                <div class="rating-result" title="90%">
+                                                    <span>
+                                                        <span>90%</span>
+                                                    </span>
+                                                </div>
+                                                <div class="product-price">
+                                                    <span>₹<%= featuredProds[i]?.salePrice %></span>
+                                                    <span class="old-price">₹<%= featuredProds[i]?.regularPrice %></span>
+                                                </div>
+                                                <div class="product-action-1 show">
+                                                    <a aria-label="Add To Cart" onclick="addToCart('<%= featuredProds[i]?._id %>')" class="action-btn hover-up"><i class="fi-rs-shopping-bag-add"></i></a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% } %>
+                            <% } %>
+                        </div> 
+                        End product-grid-4
+                    </div> -->
+                    <!--En tab two (Popular)-->
+                    <!-- <div class="tab-pane fade" id="tab-three" role="tabpanel" aria-labelledby="tab-three">
+                        <div class="row product-grid-4">
+                            <% if (locals.featuredProds) { %>
+                                <% for( let i = 0; i < featuredProds.length; i++ ) { %>
+                                    <div class="col-lg-3 col-md-4 col-12 col-sm-6">
+                                        <div class="product-cart-wrap mb-30">
+                                            <div class="product-img-action-wrap">
+                                                <div class="product-img product-img-zoom">
+                                                    <a href="/<%= featuredProds[i]?.category.toLowerCase() %>/<%= featuredProds[i]?._id %>">
+                                                        <img class="default-img" src="/img/featuredProds/<%= featuredProds[i]?.images[0] %>" alt="<%= featuredProds[i]?.productName %>">
+                                                        <img class="hover-img" src="/img/featuredProds/<%= featuredProds[i]?.images[0] %>" alt="<%= featuredProds[i]?.productName %>">
+                                                    </a>
+                                                </div>
+                                                <div class="product-action-1">
+                                                    <a aria-label="Quick view" class="action-btn hover-up" data-bs-toggle="modal" data-bs-target="#quickViewModal"><i class="fi-rs-eye"></i></a>
+                                                    <a aria-label="Add To Wishlist" class="action-btn hover-up" href="sh#"><i class="fi-rs-heart"></i></a>
+                                                </div>
+                                                <div class="product-badges product-badges-position product-badges-mrg">
+                                                    <span class="hot">Hot</span>
+                                                </div>
+                                            </div>
+                                            <div class="product-content-wrap">
+                                                <div class="product-category">
+                                                    <a href="/<%= featuredProds[i]?.category.toLowerCase() %>"><%= featuredProds[i]?.category %></a>
+                                                </div>
+                                                <h2><a href="/<%= featuredProds[i]?.category.toLowerCase() %>/<%= featuredProds[i]?._id %>"><%= featuredProds[i]?.productName %></a></h2>
+                                                <div class="rating-result" title="90%">
+                                                    <span>
+                                                        <span>90%</span>
+                                                    </span>
+                                                </div>
+                                                <div class="product-price">
+                                                    <span>₹<%= featuredProds[i]?.salePrice %></span>
+                                                    <span class="old-price">₹<%= featuredProds[i]?.regularPrice %></span>
+                                                </div>
+                                                <div class="product-action-1 show">
+                                                    <a aria-label="Add To Cart" onclick="addToCart('<%= featuredProds[i]?._id %>')" class="action-btn hover-up"><i class="fi-rs-shopping-bag-add"></i></a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% } %>
+                            <% } %>
+                            
+                        </div>
+                        End product-grid-4
+                    </div> -->
+                    <!--En tab three (New added)-->
+                </div>
+                <!--End tab-content-->
+            </div>
+        </section>
+        <!-- <section class="section-padding">
+            <div class="container pb-10">
+                <h3 class="section-title mb-20 wow fadeIn animated"><span>Featured</span> Brands</h3>
+                <div class="carausel-6-columns-cover position-relative wow fadeIn animated">
+                    <div class="slider-arrow slider-arrow-2 carausel-6-columns-arrow" id="carausel-6-columns-3-arrows"></div>
+                    <div class="carausel-6-columns text-center" id="carausel-6-columns-3">
+                        <div class="brand-logo">
+                            <img class="img-grey-hover" src="/assets/imgs/banner/brand-1.png" alt="">
+                        </div>
+                        <div class="brand-logo">
+                            <img class="img-grey-hover" src="/assets/imgs/banner/brand-2.png" alt="">
+                        </div>
+                        <div class="brand-logo">
+                            <img class="img-grey-hover" src="/assets/imgs/banner/brand-3.png" alt="">
+                        </div>
+                        <div class="brand-logo">
+                            <img class="img-grey-hover" src="/assets/imgs/banner/brand-4.png" alt="">
+                        </div>
+                        <div class="brand-logo">
+                            <img class="img-grey-hover" src="/assets/imgs/banner/brand-5.png" alt="">
+                        </div>
+                        <div class="brand-logo">
+                            <img class="img-grey-hover" src="/assets/imgs/banner/brand-6.png" alt="">
+                        </div>
+                        <div class="brand-logo">
+                            <img class="img-grey-hover" src="/assets/imgs/banner/brand-3.png" alt="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section> -->
+        <% if (locals.banners) { %>
+        <% if (banners.length > 1) { %>
+        <% let i = banners.length-1 %>
+        <% if (banners[i]?.isActive) { %>
+        <section class="banner-2 section-padding pb-0">
+            <div class="container">
+                <div class="banner-img banner-big wow fadeIn animated f-none">
+                    <img src="/img/banners/<%= banners[i]?.image %>" alt="">
+                    <div class="banner-text d-md-block d-none">
+                        <h4 class="mb-15 mt-40 text-brand"><%= banners[i]?.description %></h4>
+                        <h1 class="fw-600 mb-20 text-white"><%= banners[i]?.title %></h1>
+                        <a href="<%= banners[i]?.link %>" class="btn">Learn More <i class="fi-rs-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <% } %>
+        <% } %>
+        <% } %>
+        <!-- Popular Categories -->
+        <section class="popular-categories section-padding mt-15">
+            <div class="container wow fadeIn animated">
+                <h3 class="section-title mb-20"><span>Popular</span> Categories</h3>
+                <div class="carausel-6-columns-cover position-relative">
+                    <div class="slider-arrow slider-arrow-2 carausel-6-columns-arrow" id="carausel-6-columns-arrows"></div>
+                    <div class="carausel-6-columns" id="carausel-6-columns">
+                        <% if (locals.categories) { %>
+                            <% for (let i = 0; i < categories.length; i++) { %>
+                                <% if(categories[i].isListed) { %>
+                                    <div class="card-1">
+                                        <figure class=" img-hover-scale overflow-hidden">
+                                            <a href="/<%= categories[i].categoryName.toLowerCase() %>">
+                                                <!-- <img src="/assets/imgs/shop/category-thumb-1.jpg" alt=""> -->
+                                            </a>
+                                        </figure>
+                                        <h5><a href="/<%= categories[i].categoryName.toLowerCase() %>"><%= categories[i].categoryName %></a></h5>
+                                    </div>
+                                <% } %>
+                            <% } %>                                        
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Banner 2 -->
+        <section class="banners mb-20">
+            <div class="container">
+                <div class="row">
+                    <% if (locals.categories) { %>
+                        <% for (let i = 0; i < categories.length && i < 3; i++) { %>
+                            <% if(categories[i].isListed) { %>
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="banner-img wow fadeIn animated">
+                                        <img src="/assets/imgs/banner/banner-1.png" alt="">
+                                        <div class="banner-text">
+                                            <span>Smart Offer</span>
+                                            <h4><%= categories[i].categoryName %></h4>
+                                            <a href="/<%= categories[i].categoryName.toLowerCase() %>">Shop Now <i class="fi-rs-arrow-right"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% } %>
+                        <% } %>                                        
+                    <% } %>
+                </div>
+            </div>
+        </section>
+        <!-- New Arrivals -->
+        <section class="pt-25 pb-20">
+            <div class="container wow fadeIn animated">
+                <h3 class="section-title mb-20"><span>New</span> Arrivals</h3>
+                <div class="carausel-6-columns-cover position-relative">
+                    <div class="slider-arrow slider-arrow-2 carausel-6-columns-arrow" id="carausel-6-columns-2-arrows"></div>
+                    <div class="carausel-6-columns carausel-arrow-center" id="carausel-6-columns-2">
+                        <!-- <div class="product-cart-wrap small hover-up">
+                            <div class="product-img-action-wrap">
+                                <div class="product-img product-img-zoom">
+                                    <a href="shop-product-right.html">
+                                        <img class="default-img" src="assets/imgs/shop/product-1-1.jpg" alt="">
+                                        <img class="hover-img" src="assets/imgs/shop/product-1-2.jpg" alt="">
+                                    </a>
+                                </div>
+                                <div class="product-action-1">
+                                    <a aria-label="Quick view" class="action-btn small hover-up" data-bs-toggle="modal" data-bs-target="#quickViewModal"><i class="fi-rs-eye"></i></a>
+                                    <a aria-label="Add To Wishlist" class="action-btn small hover-up" href="#" tabindex="0"><i class="fi-rs-heart"></i></a>
+                                </div>
+                            </div>
+                            <div class="product-content-wrap">
+                                <h2><a href="shop-product-right.html">Some Product</a></h2>
+                                <div class="rating-result" title="90%">
+                                    <span>
+                                    </span>
+                                </div>
+                                <div class="product-price">
+                                    <span>₹23800 </span>
+                                    <span class="old-price">₹24500</span>
+                                </div>
+                            </div>
+                        </div> -->
+                        <!--End product-cart-wrap-2-->
+                        <% if (locals.newArrivalProds) { %>
+                            <% for( let i = 0; i < newArrivalProds.length; i++ ) { %>
+                                <div class="product-cart-wrap small hover-up">
+                                    <div class="product-img-action-wrap">
+                                        <div class="product-img product-img-zoom">
+                                            <a href="/<%= newArrivalProds[i]?.category.toLowerCase() %>/<%= newArrivalProds[i]?._id %>">
+                                                <img class="default-img" src="/img/products/<%= newArrivalProds[i]?.images[0] %>" alt="<%= newArrivalProds[i]?.productName %>">
+                                                <img class="hover-img" src="/img/products/<%= newArrivalProds[i]?.images[0] %>" alt="<%= newArrivalProds[i]?.productName %>">
+                                            </a>
+                                        </div>
+                                        <div class="product-action-1">
+                                            <a aria-label="Quick view" class="action-btn small hover-up" data-bs-toggle="modal" data-bs-target="#quickViewModal"><i class="fi-rs-eye"></i></a>
+                                            <a aria-label="Add To Wishlist" onclick="addToWishlist('<%= newArrivalProds[i]?._id %>')" class="action-btn small hover-up" href="#" tabindex="0"><i class="fi-rs-heart"></i></a>
+                                        </div>
+                                    </div>
+                                    <div class="product-content-wrap">
+                                        <h2><a href="/<%= newArrivalProds[i]?.category.toLowerCase() %>/<%= newArrivalProds[i]?._id %>"><%= newArrivalProds[i]?.productName %></a></h2>
+                                        <div class="rating-result" title="90%">
+                                            <span>
+                                            </span>
+                                        </div>
+                                        <div class="product-price">
+                                            <span>₹<%= newArrivalProds[i]?.salePrice %></span>
+                                            <span class="old-price">₹<%= newArrivalProds[i]?.regularPrice %></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% } %>
+                        <% } %>                        
+                        <!--End product-cart-wrap-2-->
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!--  -->
+        <section class="featured section-padding">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-2 col-md-4 mb-md-3 mb-lg-0">
+                        <div class="banner-features wow fadeIn animated hover-up animated">
+                            <img src="/assets/imgs/theme/icons/feature-1.png" alt="">
+                            <h4 class="bg-1">Free Shipping</h4>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-4 mb-md-3 mb-lg-0">
+                        <div class="banner-features wow fadeIn animated hover-up animated">
+                            <img src="/assets/imgs/theme/icons/feature-2.png" alt="">
+                            <h4 class="bg-3">Online Order</h4>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-4 mb-md-3 mb-lg-0">
+                        <div class="banner-features wow fadeIn animated hover-up animated">
+                            <img src="/assets/imgs/theme/icons/feature-3.png" alt="">
+                            <h4 class="bg-2">Save Money</h4>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-4 mb-md-3 mb-lg-0">
+                        <div class="banner-features wow fadeIn animated hover-up animated">
+                            <img src="/assets/imgs/theme/icons/feature-4.png" alt="">
+                            <h4 class="bg-4">Promotions</h4>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-4 mb-md-3 mb-lg-0">
+                        <div class="banner-features wow fadeIn animated hover-up animated">
+                            <img src="/assets/imgs/theme/icons/feature-5.png" alt="">
+                            <h4 class="bg-5">Happy Sell</h4>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-4 mb-md-3 mb-lg-0">
+                        <div class="banner-features wow fadeIn animated hover-up animated">
+                            <img src="/assets/imgs/theme/icons/feature-6.png" alt="">
+                            <h4 class="bg-6">24/7 Support</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Footer -->
+    <%- include('./partials/home/home-footer.ejs') %>
+    
+
+    <!-- Preloader Start -->
+    <%- include('./partials/home/home-preloader.ejs') %> 
+
+    <!-- Vendor JS-->
+    <script src="/assets/js/vendor/modernizr-3.6.0.min.js"></script>
+    <script src="/assets/js/vendor/jquery-3.6.0.min.js"></script>
+    <script src="/assets/js/vendor/jquery-migrate-3.3.0.min.js"></script>
+    <script src="/assets/js/vendor/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/plugins/slick.js"></script>
+    <script src="/assets/js/plugins/jquery.syotimer.min.js"></script>
+    <script src="/assets/js/plugins/wow.js"></script>
+    <script src="/assets/js/plugins/jquery-ui.js"></script>
+    <script src="/assets/js/plugins/perfect-scrollbar.js"></script>
+    <script src="/assets/js/plugins/magnific-popup.js"></script>
+    <script src="/assets/js/plugins/select2.min.js"></script>
+    <script src="/assets/js/plugins/waypoints.js"></script>
+    <script src="/assets/js/plugins/counterup.js"></script>
+    <script src="/assets/js/plugins/jquery.countdown.min.js"></script>
+    <script src="/assets/js/plugins/images-loaded.js"></script>
+    <script src="/assets/js/plugins/isotope.js"></script>
+    <script src="/assets/js/plugins/scrollup.js"></script>
+    <script src="/assets/js/plugins/jquery.vticker-min.js"></script>
+    <script src="/assets/js/plugins/jquery.theia.sticky.js"></script>
+    <script src="/assets/js/plugins/jquery.elevatezoom.js"></script>
+    <!-- Template  JS -->
+    <script src="/assets/js/main.js?v=3.4"></script>
+    <script src="/assets/js/shop.js?v=3.4"></script>
+    <script>
+        function addToCart(prodId){
+            console.log(prodId); 
+            const url = "/add-to-cart/"+ prodId;
+            console.log(url); 
+            $.ajax({
+                url: url, //your url
+                method: "GET",
+                success: function(response){
+                    console.log(response);
+                    if(response.status){
+                        let count = $('#cartItemsCount').text();
+                        count = parseInt(count) + Number(1);
+                        console.log("Count : " + count);
+                        $('#cartItemsCount').text(count);
+                    } else {
+                        window.location.href = '/user/login';
+                    }
+                },
+                error: function(){
+                    alert("error");
+                }
+            });
+        }
+
+        function addToWishlist(prodId){
+            console.log(prodId); 
+            const url = "/add-to-wishlist/"+ prodId;
+            console.log(url); 
+            $.ajax({
+                url: url,
+                method: "GET",
+                success: function(response){
+                    console.log(response);
+                    if(response.status){
+                        let count = $('#wishItemsCount').text();
+                        if(response.add){
+                            count = parseInt(count) + Number(1);
+                        } else {
+                            count = parseInt(count) - Number(1);                            
+                        }
+                        console.log("Count : " + count);
+                        $('#wishItemsCount').text(count);
+                    } else {
+                        window.location.href = '/user/login';
+                    }
+                },
+                error: function(){
+                    alert("error");
+                }
+            });
+        }
+    </script>
+    <!-- <script>
+        $(document).on( "click", '.edit_button',function(e) {
+            const id = $(this).data('id');
+            const categoryName = $(this).data('categoryname');
+            const description = $(this).data('description');
+            const slug = $(this).data('slug');
+            const isListed = $(this).data('listed');
+            console.log(isListed);
+            $(".edit-id").val(id);
+            $(".edit-categoryname").val(categoryName);
+            $(".edit-description").val(description);
+            $(".edit-slug").val(slug);
+            $(".edit-islisted").val(isListed);
+            if(isListed === true)
+                document.getElementById("flexSwitchCheckChecked").setAttribute("checked", "checked");
+        });
+        $('#quickViewModal').on('show.bs.modal', function (event) {
+            let productname = button.data('productname');           
+            let img = button.data('img');           
+            let category = button.data('category');           
+            let saleprice = button.data('saleprice');           
+            let regularprice = button.data('regularprice');           
+            let productid = button.data('productid');           
+            let modal = $(this);
+
+            modal.find('#modalProductName').text(productname);
+            modal.find('#modalProductName').text(img);
+            modal.find('#modalProductName').text(category);
+            modal.find('#modalSalePrice').text(saleprice);
+            modal.find('#modalRegularPrice').text(regularprice);
+            modal.find('#modalProductName').text(productid);
+            
+            if( btnAction === "add" ) {  
+                $('#modalForm').attr('action', '/admin/add-category');
+                document.getElementById("flexSwitchCheckChecked").setAttribute("checked", "checked");
+                $('#modal-save-btn').text('Add category');
+                
+                document.getElementById("modalForm").reset();
+            }
+            else if( btnAction === "edit" ) {
+                $('#modalForm').attr('action', '/admin/edit-category');
+                $('#modal-save-btn').text('Save changes');
+            }
+        });
+    </script> -->
+</body>
+
+</html>

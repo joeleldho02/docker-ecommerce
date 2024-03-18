@@ -1,0 +1,158 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Product Management</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="/assets2/imgs/theme/favicon.svg">
+    <!-- Template CSS -->
+    <link href="/assets2/css/main.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/css/dataTables.bootstrap4.min.css" integrity="sha512-PT0RvABaDhDQugEbpNMwgYBCnGCiTZMh9yOzUsJHDgl/dMhD9yjHAwoumnUk3JydV3QTcIkNDuN40CJxik5+WQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="/css/datatable.css">
+    <link rel="stylesheet" href="/css/custom-alert.css">
+
+</head>
+
+<body>
+    <%- include('./partials/admin/admin-side-nav.ejs', {currTab: 'products'}) %>
+    <main class="main-wrap">
+        <%- include('./partials/admin/admin-header.ejs') %>
+        <section class="content-main">
+            <!-- Begin Page Content -->
+            <div class="container-fluid">
+                <!-- DataTales Example -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 row d-flex">
+                        <div class="col-6">
+                            <h6 class="my-auto font-weight-bold text-primary">Product Management</h6>
+                        </div>
+                        <div class="col-6 text-end">
+                            <a href="/admin/add-product" class="btn btn-primary"><i class="material-icons md-plus"></i> Add Product</a>
+                        </div>
+                        <!-- <h6 class="my-auto font-weight-bold text-primary">Product Management</h6>
+                        <a href="/admin/add-product" class="btn btn-primary"><i class="material-icons md-plus"></i> Add Product</a> -->
+                        <!-- <div class="col-md-3 col-12 me-auto mb-md-0 mb-3 mx-3">
+                            <select class="form-select">
+                                <option selected>All category</option>
+                                <option>Electronics</option>
+                                <option>Clothes</option>
+                                <option>Automobile</option>
+                            </select>
+                        </div> -->
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Description</th>
+                                        <th>Category</th>
+                                        <th>Sale Price</th>
+                                        <th>Stock</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% if (locals.products) { %>  
+                                    <% for (let i = 0; i < products.length; i++) { %>
+                                        <tr>
+                                          <td>
+                                            <div class="col-lg-12 col-sm-4 col-8 flex-grow-1 col-name">
+                                                <a class="itemside" href="/<%= products[i]?.category?.toLowerCase() %>/<%= products[i]._id %>" target="_blank">
+                                                    <div class="left d-none d-lg-block">
+                                                        <% if (products[i].images.length > 0) { %>  
+                                                            <img src="/img/products/<%= products[i].images[0] %>" class="img-sm img-thumbnail" alt="<%= products[i].productName %>">
+                                                        <% } %>
+                                                    </div>
+                                                    <div class="info">
+                                                        <h6 class="mb-0"><%= products[i].productName %></h6>
+                                                    </div>  
+                                                </a>                  
+                                            </div>                        
+                                          </td>
+                                          <td style="vertical-align: middle;"><%= products[i].shortDescription %></td>
+                                          <td style="vertical-align: middle;"><%= products[i].category %></td>
+                                          <td style="vertical-align: middle;"><%= products[i].salePrice %></td>
+                                          <td style="vertical-align: middle;"><%= products[i].stock %></td>
+                                          <!-- <td style=" text-overflow: ellipsis;"><%= products[i].images[0] %></td> -->
+                                          <td style="vertical-align: middle;">
+                                            <div class="col-lg-2 col-sm-2 col-4 col-action text-end d-flex">
+                                                <a class="ms-2" href="/admin/edit-product/<%= products[i]._id %>">
+                                                    <span class="material-icons md-edit iconbtn" title="Edit <%= products[i].productName %>">
+                                                        <span style="color:#000000; font-size:small; font-family: Arial, Helvetica, sans-serif;"></span>
+                                                    </span>
+                                                </a>
+                                                <form id="hidden-form-<%= i %>" action="/admin/delete-product" method="POST" style="display: none;">
+                                                  <input type="hidden" name="productID" value="<%= products[i]._id %>" />
+                                                </form>
+                                                <a class="ms-3 me-0" onclick="confirmDelete('hidden-form-<%= i %>', '<%= products[i].productName %>')">
+                                                    <span class=" material-icons md-delete_forever" title="Delete <%= products[i].productName %>">
+                                                        <span class="mb-2" style="color:#000000; font-size:small; font-family: Arial, Helvetica, sans-serif;"></span>
+                                                    </span>
+                                                </a>
+                                            </div>
+                                          </td>
+                                        </tr>    
+                                       <% } %>
+                                       <% }  %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.container-fluid -->   
+                    
+            
+        </section> <!-- content-main end// -->
+        <!-- Custom Confirm Dialog -->
+        <%- include('./partials/home/custom-confirm-dialog.ejs') %>        
+        <!-- Footer -->
+        <%- include('./partials/admin/admin-footer.ejs') %>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="/assets2/js/vendors/bootstrap.bundle.min.js"></script>
+    <script src="/assets2/js/vendors/select2.min.js"></script>
+    <script src="/assets2/js/vendors/perfect-scrollbar.js"></script>
+    <script src="/assets2/js/vendors/jquery.fullscreen.min.js"></script>
+    <!-- Main Script -->
+    <script src="/assets2/js/main.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js" integrity="sha512-0QbL0ph8Tc8g5bLhfVzSqxe9GERORsKhIn1IrpxDAgUsbBGz/V7iSav2zzW325XGd1OMLdL4UiqRJj702IeqnQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Page level plugins -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js" integrity="sha512-BkpSL20WETFylMrcirBahHfSnY++H2O1W+UnEEO4yNIl+jI2+zowyoGJpbtk6bx97fBXf++WJHSSK2MV4ghPcg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap4.min.js" integrity="sha512-OQlawZneA7zzfI6B1n1tjUuo3C5mtYuAWpQdg+iI9mkDoo7iFzTqnQHf+K5ThOWNJ9AbXL4+ZDwH7ykySPQc+A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap4.min.js" integrity="sha512-OQlawZneA7zzfI6B1n1tjUuo3C5mtYuAWpQdg+iI9mkDoo7iFzTqnQHf+K5ThOWNJ9AbXL4+ZDwH7ykySPQc+A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Page level custom scripts -->
+    <script src="/js/custom-confirm.js"></script>
+    <script>
+        // Call the dataTables jQuery plugin
+        $(document).ready(function() {
+            $('#dataTable').DataTable({
+                order: [[0, 'asc']]
+            });
+        });    
+        // function confirmDelete(formID, name) {
+        //     if (confirm(`Are you sure to delete the product ${name}?`)) {
+        //         document.getElementById(formID).submit();
+        //     }
+        // }
+
+        function confirmDelete(formID, name) {
+            customConfirm('Hey there!', `Are you sure to delete the product '${name}'?`, submitDeleteForm, formID);
+        }
+        function submitDeleteForm(formID){
+            document.getElementById(formID).submit();
+            console.log("category delete form SUBMITTED!!");
+        }
+    </script>
+</body>
+
+</html>

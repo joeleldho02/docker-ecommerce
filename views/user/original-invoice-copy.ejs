@@ -1,0 +1,349 @@
+
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>View Order</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="/assets/imgs/theme/favicon.svg">
+    <!-- Template CSS -->
+    <link href="/assets2/css/main.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="/assets/css/main.css?v=3.4">
+    <link rel="stylesheet" href="/css/form-error.css" />
+</head>
+
+<body>   
+    <!-- Header -->
+    <%- include('./partials/user/user-header.ejs', {currTab: 'orders'}) %>
+    <!-- Mobile Header -->
+    <%- include('./partials/user/user-mobile-header.ejs', {currTab: 'orders'}) %>
+    
+    <main class="main">
+        <div class="page-header breadcrumb-wrap">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="/" rel="nofollow">User</a>
+                    <span></span> Orders
+                    <span></span> View Order
+                </div>
+            </div>
+        </div>
+        <section class="content-main">
+            <div class="content-header">
+                <div>
+                    <h2 class="content-title card-title">Order Invoice</h2>
+                    <p>Details for Order ID: #<% if (locals.order) { %><%= order[0]?._id %><% } %></p>
+                </div>
+            </div>
+            <% if (locals.order) { %>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <header class="card-header">
+                            <div class="row align-items-center">
+                                <div class="col-lg-6 col-md-6 mb-lg-0 mb-15">
+                                    <span>
+                                        <i class="material-icons md-calendar_today"></i> <b><%= order[0]?.createdAt.toLocaleString() %></b>
+                                    </span> <br>
+                                    <small class="text-muted">Order ID: #<%= order[0]?._id %></small>
+                                </div>
+                                <div class="col-lg-6 col-md-6 ms-auto text-md-end">                                   
+                                    <a class="btn btn-primary" href="/user/download-invoice<% if (locals.order) { %>/<%= order[0]?._id %><% } %>"> <i class="icon material-icons md-cloud_download mr-5"></i>Save PDF</a>
+                                </div>
+                            </div>
+                        </header> <!-- card-header end// -->
+                        <div class="card-body">
+                            <div class="receipt-content">
+                                <div class="container bootstrap snippets bootdey">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="invoice-wrapper mb-15">
+                                                <div class="intro">
+                                                    Hi <strong><%= order[0]?.customerInfo[0]?.firstName %> <%= order[0]?.customerInfo[0]?.lastName %></strong>,
+                                                    <br>
+                                                    This is the invoice for order <strong>#<%= order[0]?._id %></strong> of <b>₹ <%= order[0]?.finalAmount %></b>
+                                                </div>
+                    
+                                                <div class="payment-info">
+                                                    <div class="row">
+                                                        <div class="col-sm-6">
+                                                            <span >Payment status:</span>
+                                                            <strong>
+                                                                <% if(typeof order[0]?.paymentStatus === 'string') { %>
+                                                                    <span style="color: #000000; font-weight: 700; font-size: 13px;"
+                                                                    <% if (order[0]?.paymentStatus.toLowerCase() == "pending") { %> class="badge badge-pill bg-info"
+                                                                    <% } else if (order[0]?.paymentStatus.toLowerCase() == "paid") { %> class="badge badge-pill bg-success"
+                                                                    <% } else if (order[0]?.paymentStatus.toLowerCase() == "not paid") { %> class="badge badge-pill bg-danger"
+                                                                    <% } else if (order[0]?.paymentStatus.toLowerCase() == "refunded") { %> class="badge badge-pill bg-warning" <% } %> 
+                                                                    ><%= order[0]?.paymentStatus %></span>   
+                                                                <% } %>
+                                                            </strong>
+                                                            <% if(locals.order[0]?.paymentDetails?.razorpay_payment_id) { %>
+                                                                <span>Refecrence ID</span>
+                                                                <strong><%= order[0]?.paymentDetails?.razorpay_payment_id %></strong>
+                                                            <% } %>
+                                                        </div>
+                                                        <% if(locals.order[0]?.paymentDetails?.walletBalance || locals.order[0]?.paymentDetails?.razorpay_payment_id) { %>
+                                                            <div class="col-sm-6 text-end">
+                                                                <span>Payment Date</span>
+                                                                <strong><%= order[0]?.createdAt.toLocaleString() %></strong>
+                                                            </div>
+                                                        <% } %>
+                                                    </div>
+                                                </div>
+                    
+                                                <div class="payment-details">
+                                                    <div class="row">
+                                                        <div class="col-sm-6">
+                                                            <span>Customer</span>
+                                                            <strong>
+                                                                <%= order[0]?.customerInfo[0]?.firstName %> <%= order[0]?.customerInfo[0]?.lastName %>
+                                                            </strong>
+                                                            <p>
+                                                                <%= order[0]?.shippingAddress?.addressLine1 %> <br>
+                                                                <% if(locals.order[0]?.shippingAddress?.addressLine2) { %><%= order[0]?.shippingAddress?.addressLine2 %> <br><% } %>
+                                                                <%= order[0]?.shippingAddress?.city %>, <%= order[0]?.shippingAddress?.state %>, <%= order[0]?.shippingAddress?.country %> <br>
+                                                                <%= order[0]?.shippingAddress?.pincode %> <br>
+                                                                <a href="#">
+                                                                    <%= order[0]?.shippingAddress?.email %>
+                                                                </a>
+                                                            </p>
+                                                        </div>
+                                                        <div class="col-sm-6 text-end">
+                                                            <span>Payment To</span>
+                                                            <strong>
+                                                                JMJ Music House
+                                                            </strong>
+                                                            <p>
+                                                                White Field <br>
+                                                                Bangalore <br>
+                                                                650013 <br>
+                                                                India <br>
+                                                                <a href="#">
+                                                                    orders@jmjmusichouse.com
+                                                                </a>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                    
+                                                <div class="line-items">
+                                                    <div class="headers clearfix">
+                                                        <div class="row">
+                                                            <div class="col-md-4">Description</div>
+                                                            <div class="col-md-2">Quantity</div>
+                                                            <div class="col-md-2 text-end">Price</div>
+                                                            <div class="col-md-4 text-end">Amount</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="items">
+                                                        <% for (let i = 0; i < order.length; i++) { %>
+                                                        <div class="row item">
+                                                            <div class="col-md-4 desc">
+                                                                <%= order[i].productInfo[0]?.productName %>
+                                                            </div>
+                                                            <div class="col-md-2 qty">
+                                                                <%= order[i].products?.quantity %>
+                                                            </div>
+                                                            <div class="col-md-2 qty text-end">
+                                                                <%= order[i].products?.salePrice %>
+                                                            </div>
+                                                            <div class="col-md-4 amount text-end">
+                                                                ₹<%= order[i].products?.quantity * order[i]?.products?.salePrice %>
+                                                            </div>
+                                                        </div>
+                                                        <% }  %>
+                                                    </div>
+                                                    <div class="total text-end">
+                                                        <p class="extra-notes">
+                                                            <strong>Extra Notes</strong>
+                                                            <%= order[0]?.shippingAddress?.notes %>
+                                                        </p>
+                                                        <div class="field">
+                                                            Subtotal <span>₹ <%= order[0]?.totalAmount %></span>
+                                                        </div>
+                                                        <div class="field">
+                                                            Shipping <span>₹ <%= order[0]?.shippingCost || '0' %></span>
+                                                        </div>
+                                                        <div class="field">
+                                                            Discount <span>- ₹ <%= order[0]?.discount || '0' %></span>
+                                                        </div>
+                                                        <div class="field grand-total">
+                                                            Total <span>₹ <%= order[0]?.finalAmount %></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="footer mb-30">
+                                                    Copyright © 2023. JMJ Music House
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> <!-- card-body end// -->
+                    </div> <!-- card end// -->
+                </div>
+            </div>
+            <% } %> 
+        </section> <!-- content-main end// -->
+    </main>
+    <footer class="main">
+        <section class="newsletter p-30 text-white wow fadeIn animated">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-7 mb-md-3 mb-lg-0">
+                        <div class="row align-items-center">
+                            <div class="col flex-horizontal-center">
+                                <img class="icon-email" src="/assets/imgs/theme/icons/icon-email.svg" alt="">
+                                <h4 class="font-size-20 mb-0 ml-3">Sign up to Newsletter</h4>
+                            </div>
+                            <div class="col my-4 my-md-0 des">
+                                <h5 class="font-size-15 ml-4 mb-0">...and receive <strong>$25 coupon for first shopping.</strong></h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-5">
+                        <!-- Subscribe Form -->
+                        <form class="form-subcriber d-flex wow fadeIn animated">
+                            <input type="email" class="form-control bg-white font-small" placeholder="Enter your email">
+                            <button class="btn bg-dark text-white" type="submit">Subscribe</button>
+                        </form>
+                        <!-- End Subscribe Form -->
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="section-padding footer-mid">
+            <div class="container pt-15 pb-20">
+                <div class="row">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="widget-about font-md mb-md-5 mb-lg-0">
+                            <div class="logo logo-width-1 wow fadeIn animated">
+                                <a href="index.html"><img src="/assets/imgs/theme/logo.svg" alt="logo"></a>
+                            </div>
+                            <h5 class="mt-20 mb-10 fw-600 text-grey-4 wow fadeIn animated">Contact</h5>
+                            <p class="wow fadeIn animated">
+                                <strong>Address: </strong>562 Wellington Road, Street 32, San Francisco
+                            </p>
+                            <p class="wow fadeIn animated">
+                                <strong>Phone: </strong>+01 2222 365 /(+91) 01 2345 6789
+                            </p>
+                            <p class="wow fadeIn animated">
+                                <strong>Hours: </strong>10:00 - 18:00, Mon - Sat
+                            </p>
+                            <h5 class="mb-10 mt-30 fw-600 text-grey-4 wow fadeIn animated">Follow Us</h5>
+                            <div class="mobile-social-icon wow fadeIn animated mb-sm-5 mb-md-0">
+                                <a href="#"><img src="/assets/imgs/theme/icons/icon-facebook.svg" alt=""></a>
+                                <a href="#"><img src="/assets/imgs/theme/icons/icon-twitter.svg" alt=""></a>
+                                <a href="#"><img src="/assets/imgs/theme/icons/icon-instagram.svg" alt=""></a>
+                                <a href="#"><img src="/assets/imgs/theme/icons/icon-pinterest.svg" alt=""></a>
+                                <a href="#"><img src="/assets/imgs/theme/icons/icon-youtube.svg" alt=""></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-3">
+                        <h5 class="widget-title wow fadeIn animated">About</h5>
+                        <ul class="footer-list wow fadeIn animated mb-sm-5 mb-md-0">
+                            <li><a href="#">About Us</a></li>
+                            <li><a href="#">Delivery Information</a></li>
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Terms &amp; Conditions</a></li>
+                            <li><a href="#">Contact Us</a></li>
+                            <li><a href="#">Support Center</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-2  col-md-3">
+                        <h5 class="widget-title wow fadeIn animated">My Account</h5>
+                        <ul class="footer-list wow fadeIn animated">
+                            <li><a href="#">Sign In</a></li>
+                            <li><a href="#">View Cart</a></li>
+                            <li><a href="#">My Wishlist</a></li>
+                            <li><a href="#">Track My Order</a></li>
+                            <li><a href="#">Help</a></li>
+                            <li><a href="#">Order</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-4">
+                        <h5 class="widget-title wow fadeIn animated">Install App</h5>
+                        <div class="row">
+                            <div class="col-md-8 col-lg-12">
+                                <p class="wow fadeIn animated">From App Store or Google Play</p>
+                                <div class="download-app wow fadeIn animated">
+                                    <a href="#" class="hover-up mb-sm-4 mb-lg-0"><img class="active" src="/assets/imgs/theme/app-store.jpg" alt=""></a>
+                                    <a href="#" class="hover-up"><img src="/assets/imgs/theme/google-play.jpg" alt=""></a>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-12 mt-md-3 mt-lg-0">
+                                <p class="mb-20 wow fadeIn animated">Secured Payment Gateways</p>
+                                <img class="wow fadeIn animated" src="/assets/imgs/theme/payment-method.png" alt="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="container pb-20 wow fadeIn animated">
+            <div class="row">
+                <div class="col-12 mb-20">
+                    <div class="footer-bottom"></div>
+                </div>
+                <div class="col-lg-6">
+                    <p class="float-md-left font-sm text-muted mb-0">&copy; 2022, <strong class="text-brand">Evara</strong> - HTML Ecommerce Template </p>
+                </div>
+                <div class="col-lg-6">
+                    <p class="text-lg-end text-start font-sm text-muted mb-0">
+                        Designed by <a href="http://alithemes.com" target="_blank">Alithemes.com</a>. All rights reserved
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- Preloader Start -->
+    <div id="preloader-active">
+        <div class="preloader d-flex align-items-center justify-content-center">
+            <div class="preloader-inner position-relative">
+                <div class="text-center">
+                    <h5 class="mb-5">Now Loading</h5>
+                    <div class="loader">
+                        <div class="bar bar1"></div>
+                        <div class="bar bar2"></div>
+                        <div class="bar bar3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Vendor JS-->
+    <script src="/assets/js/vendor/modernizr-3.6.0.min.js"></script>
+    <script src="/assets/js/vendor/jquery-3.6.0.min.js"></script>
+    <script src="/assets/js/vendor/jquery-migrate-3.3.0.min.js"></script>
+    <script src="/assets/js/vendor/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/plugins/slick.js"></script>
+    <script src="/assets/js/plugins/jquery.syotimer.min.js"></script>
+    <script src="/assets/js/plugins/wow.js"></script>
+    <script src="/assets/js/plugins/jquery-ui.js"></script>
+    <script src="/assets/js/plugins/perfect-scrollbar.js"></script>
+    <script src="/assets/js/plugins/magnific-popup.js"></script>
+    <script src="/assets/js/plugins/select2.min.js"></script>
+    <script src="/assets/js/plugins/waypoints.js"></script>
+    <script src="/assets/js/plugins/counterup.js"></script>
+    <script src="/assets/js/plugins/jquery.countdown.min.js"></script>
+    <script src="/assets/js/plugins/images-loaded.js"></script>
+    <script src="/assets/js/plugins/isotope.js"></script>
+    <script src="/assets/js/plugins/scrollup.js"></script>
+    <script src="/assets/js/plugins/jquery.vticker-min.js"></script>
+    <script src="/assets/js/plugins/jquery.theia.sticky.js"></script>
+    <!-- Template  JS -->
+    <script src="/assets/js/main.js?v=3.4"></script>  
+</body>
+
+</html>

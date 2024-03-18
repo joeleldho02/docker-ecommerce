@@ -1,0 +1,215 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Customers</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <!-- Favicon -->
+    
+    <link rel="shortcut icon" type="image/x-icon" href="/assets2/imgs/theme/favicon.svg">
+    <!-- Template CSS -->
+    <link href="/assets2/css/main.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/css/dataTables.bootstrap4.min.css" integrity="sha512-PT0RvABaDhDQugEbpNMwgYBCnGCiTZMh9yOzUsJHDgl/dMhD9yjHAwoumnUk3JydV3QTcIkNDuN40CJxik5+WQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="/css/datatable.css">
+</head>
+
+<body>
+    <%- include('./partials/admin/admin-side-nav.ejs', {currTab: 'customers'}) %>
+    <main class="main-wrap">
+        <%- include('./partials/admin/admin-header.ejs') %>
+        <section class="content-main">
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+                    <!-- DataTales Example -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Customer Management</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Phone</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tfoot>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Phone</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </tfoot>
+                                    <tbody>
+                                      <% if (locals.users) { %>
+                                        <% for (let i = 0; i < users.length; i++) { %>
+                                            <tr>
+                                              <td><%= users[i].firstName + " " + users[i].lastName %></td>
+                                              <td><%= users[i].email %></td>
+                                              <td><%= users[i].phone %></td>
+                                              <td>                                               
+                                                <% if(users[i].isActive){ %>
+                                                    <span class="badge rounded-pill alert-success">Active</span>
+                                                <% } else{ %>  
+                                                    <span class="badge rounded-pill alert-danger">Inactive</span>
+                                                <% } %>  
+                                              </td>
+                                              <td>
+                                                <div class="col-lg-2 col-sm-2 col-4 col-action text-end d-flex">
+                                                    <a class="ms-2 edit_button"
+                                                        data-bs-toggle="modal" data-bs-target="#myModal" 
+                                                        data-id="<%= users[i]._id %>"
+                                                        data-firstname="<%= users[i].firstName %>"
+                                                        data-lastname="<%= users[i].lastName %>"
+                                                        data-email="<%= users[i].email %>"
+                                                        data-phone="<%= users[i].phone %>"
+                                                        data-isactive="<%= users[i].isActive %>"
+                                                        >
+                                                        <span class="material-icons md-edit iconbtn" title="Edit <%= users[i].firstName %>">
+                                                            <span style="color:#000000; font-size:small; font-family: Arial, Helvetica, sans-serif;"></span>
+                                                        </span>
+                                                    </a>
+                                                    <form id="hidden-form-<%= i %>" action="/admin/delete-user" method="POST" style="display: none;">
+                                                      <input type="hidden" name="userID" value="<%= users[i]._id %>" />
+                                                    </form>
+                                                    <a class="ms-3 me-0" onclick="confirmDelete('hidden-form-<%= i %>', '<%= users[i].firstName %>')">
+                                                        <span class=" material-icons md-delete_forever" title="Delete <%= users[i].firstName %>">
+                                                            <span class="mb-2" style="color:#000000; font-size:small; font-family: Arial, Helvetica, sans-serif;"></span>
+                                                        </span>
+                                                    </a> 
+                                                </div>
+                                              </td>
+                                            </tr>    
+                                           <% } %>
+                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.container-fluid -->       
+        </section> <!-- content-main end// -->
+        <!-- Modal for Edit button -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Edit user details</h4>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <form method="post" action="/admin/edit-user">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <input type="hidden" class="form-control edit-id" name="id" >
+                    </div>
+                    <div class="form-group d-flex mt-1" style="column-gap: 20px;">
+                        <div class="form-group w-100">
+                            <label for="firstName">First Name</label>
+                            <input class="form-control edit-firstname" id="modalFname" name="firstName" placeholder="Enter first name" required>
+                        </div>
+                        <div class="form-group w-100">
+                            <label for="lastName">Last Name</label>
+                            <input class="form-control edit-lastname" name="lastName" placeholder="Enter last name">
+                        </div>
+                    </div>   
+                    <div class="form-group mt-3">
+                        <label for="email">Email</label>
+                        <input class="form-control edit-email" name="email" placeholder="Enter email" required>
+                    </div>                 
+                    <div class="form-group mt-3">
+                        <label for="phone">Phone</label>
+                        <input class="form-control edit-phone" name="phone" placeholder="Enter phone" required>
+                    </div>
+                    <div class="form-group mt-3">
+                        <label for="phone">Status</label>
+                        <div class="form-control form-switch">
+                            <input class="form-check-input ms-3 py-2 px-4" type="checkbox" name ="isActive" role="switch" id="flexSwitchCheckChecked">
+                        </div>
+                    </div>
+                    <div class="form-group mt-3">
+                        <input type="hidden" class="form-control edit-isactive" name="isactive" placeholder="Is Active" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- End of Modal for Edit button -->
+    <%- include('./partials/admin/admin-footer.ejs') %>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="/assets2/js/vendors/bootstrap.bundle.min.js"></script>
+    <script src="/assets2/js/vendors/select2.min.js"></script>
+    <script src="/assets2/js/vendors/perfect-scrollbar.js"></script>
+    <script src="/assets2/js/vendors/jquery.fullscreen.min.js"></script>
+    <!-- Main Script -->
+    <script src="/assets2/js/main.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js" integrity="sha512-0QbL0ph8Tc8g5bLhfVzSqxe9GERORsKhIn1IrpxDAgUsbBGz/V7iSav2zzW325XGd1OMLdL4UiqRJj702IeqnQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Page level plugins -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js" integrity="sha512-BkpSL20WETFylMrcirBahHfSnY++H2O1W+UnEEO4yNIl+jI2+zowyoGJpbtk6bx97fBXf++WJHSSK2MV4ghPcg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap4.min.js" integrity="sha512-OQlawZneA7zzfI6B1n1tjUuo3C5mtYuAWpQdg+iI9mkDoo7iFzTqnQHf+K5ThOWNJ9AbXL4+ZDwH7ykySPQc+A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap4.min.js" integrity="sha512-OQlawZneA7zzfI6B1n1tjUuo3C5mtYuAWpQdg+iI9mkDoo7iFzTqnQHf+K5ThOWNJ9AbXL4+ZDwH7ykySPQc+A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Page level custom scripts -->
+    <script>
+        // Call the dataTables jQuery plugin
+        $(document).ready(function() {
+            $('#dataTable').DataTable({
+                order: [[2, 'desc']],
+                columnDefs: [{ "targets": [4], "orderable": false }]
+            });
+        });
+
+        function confirmDelete(formID, name) {
+            if (confirm(`Are you sure to delete the user ${name}?`)) {
+                document.getElementById(formID).submit();
+            }
+        }
+        $(document).on( "click", '.edit_button',function(e) {
+            const id = $(this).data('id');
+            const firstName = $(this).data('firstname');
+            const lastName = $(this).data('lastname');
+            const email = $(this).data('email');
+            const phone = $(this).data('phone');
+            const isActive = $(this).data('isactive');
+
+            $(".edit-id").val(id);
+            $(".edit-firstname").val(firstName);
+            $(".edit-lastname").val(lastName);
+            $(".edit-email").val(email);
+            $(".edit-phone").val(phone);
+            $(".edit-isactive").val(isActive);
+            if(isActive === true)
+                document.getElementById("flexSwitchCheckChecked").setAttribute("checked", "checked");
+        });
+
+        $('#myModal').on('show.bs.modal', function (event) {
+            let button = $(event.relatedTarget); // Button that triggered the modal
+            let recipient = button.data('firstname');            
+            let modal = $(this);
+            modal.find('.modal-title').text('Edit details of ' + recipient);
+        });
+
+        $('#myModal').on('shown.bs.modal', function () {
+            $('#modalFname').trigger('focus')
+        })
+    </script>
+</body>
+
+</html>

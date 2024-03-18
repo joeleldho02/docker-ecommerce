@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>View Order</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="/assets/imgs/theme/favicon.svg">
+    <!-- Template CSS -->
+    <link href="/assets2/css/main.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="/assets/css/main.css?v=3.4">
+    <link rel="stylesheet" href="/css/form-error.css" />
+    <link rel="stylesheet" href="/css/custom-alert.css">
+    <style>
+        .notification {
+            display: none;
+            position: fixed;
+            top: 120px;
+            right: 100px;
+            background-color: #f4dede;
+            color: #121010;
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>   
+    <!-- Header -->
+    <%- include('./partials/user/user-header.ejs', {currTab: 'orders'}) %>
+
+    <!-- Mobile Header -->
+    <%- include('./partials/user/user-mobile-header.ejs', {currTab: 'orders'}) %>
+    
+    <main class="main">
+        <div class="notification" id="notification">
+            <p>Your order invoice download has started...</p>
+        </div>
+        <div class="page-header breadcrumb-wrap">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="/user" rel="nofollow">User</a>
+                    <span></span> Orders
+                    <span></span> View Order
+                </div>
+                
+            </div>
+        </div>
+        <section class="content-main">
+            <div class="container-fluid px-5">
+                <div class="content-header mx-5">
+                    <div>
+                        <h2 class="content-title card-title">Order details</h2>
+                        <p>Details for Order ID: #<% if (locals.order) { %><%= order[0]?._id %><% } %></p>
+                    </div>
+                </div>
+                <% if (locals.order) { %> 
+                <div class="card mx-5">
+                    <header class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col-lg-6 col-md-6 mb-lg-0 mb-5">
+                                <span>
+                                    <i class="material-icons md-calendar_today"></i> <b><%= order[0]?.createdAt.toLocaleString() %></b>
+                                </span> <br>
+                                <small class="text-muted">Order ID: #<%= order[0]?._id %></small>
+                            </div>
+                            <div class="col-lg-6 col-md-6 ms-auto text-md-end">
+                                <% if(order[0]?.orderStatus !== "DELIVERED" && order[0]?.orderStatus !== "CANCELLED" && order[0]?.orderStatus !== "RETURNED") { %>
+                                    <!-- <a class="btn btn-primary" href="/user/cancel-order/<%= order[0]?._id %>">CANCEL ORDER</a> -->
+                                    <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reasonModal" data-bs-title="Cancel" data-bs-route="/user/cancel-order" data-bs-orderid="<%= order[0]?._id %>">CANCEL ORDER</a>
+                                    <!-- Return Period 14 Days :- new Date(orders[i]?.createdAt).setDate(new Date().getDate()+1) > Date.now() -->
+                                    <!-- Return Period 5 mins :- new Date(orders[i]?.createdAt.getTime() + 5*60000) -->
+                                <% } else if(new Date(order[0]?.createdAt.getTime() + 5*60000) > Date.now() && order[0]?.orderStatus !== "CANCELLED" && order[0]?.orderStatus !== "RETURNED") { %>
+                                    <!-- <a class="btn btn-primary" href="/user/return-order/<%= order[0]?._id %>">RETURN ORDER</a> -->
+                                    <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reasonModal" data-bs-title="Return" data-bs-route="/user/return-order" data-bs-orderid="<%= order[0]?._id %>">RETURN ORDER</a>
+                                <% } %> 
+                                <a class="btn btn-secondary print ms-2" onclick="downloadInvoice()"> INVOICE <i class="icon material-icons md-print"></i></a>
+                            </div>
+                        </div>
+                    </header> <!-- card-header end// -->
+                    <div class="card-body">
+                        <div class="row mb-50 mt-20 order-info-wrap">
+                            <div class="col-md-4">
+                                <article class="icontext align-items-start">
+                                    <span class="icon icon-sm rounded-circle bg-primary-light">
+                                        <i class="text-primary material-icons md-person"></i>
+                                    </span>
+                                    <div class="text">
+                                        <h6 class="mb-1">Customer</h6>
+                                        <p class="mb-1">
+                                            <%= order[0]?.customerInfo[0]?.firstName %> <%= order[0]?.customerInfo[0]?.lastName %> <br>
+                                            <%= order[0]?.customerInfo[0]?.email %> <br>
+                                            <%= order[0]?.customerInfo[0]?.phone %>
+                                        </p>
+                                        <a href="/user">View profile</a>
+                                    </div>
+                                </article>
+                            </div> <!-- col// -->
+                            <div class="col-md-4">
+                                <article class="icontext align-items-start">
+                                    <span class="icon icon-sm rounded-circle bg-primary-light">
+                                        <i class="text-primary material-icons md-local_shipping"></i>
+                                    </span>
+                                    <div class="text">
+                                        <h6 class="mb-1">Order info</h6>
+                                        <p class="mb-1">
+                                            Total Items: <%= order[0]?.totalItems %> <br>
+                                            Shipping: <%= order[0]?.shippingMethod %> <br>
+                                            Order status: 
+                                            <% if(typeof order[0]?.orderStatus === 'string') { %>
+                                                <span style="font-size: 15px;"
+                                                <% if (order[0]?.orderStatus.toLowerCase() == "pending") { %> class="badge badge-pill bg-info"
+                                                <% } else if (order[0]?.orderStatus.toLowerCase() == "approved") { %> class="badge badge-pill bg-success"
+                                                <% } else if (order[0]?.orderStatus.toLowerCase() == "declined") { %> class="badge badge-pill bg-danger"
+                                                <% } else if (order[0]?.orderStatus.toLowerCase() == "shipped") { %> class="badge badge-pill bg-info"
+                                                <% } else if (order[0]?.orderStatus.toLowerCase() == "delivered") { %> class="badge badge-pill bg-success"
+                                                <% } else if (order[0]?.orderStatus.toLowerCase() == "returned") { %> class="badge badge-pill bg-warning"
+                                                <% } else if (order[0]?.orderStatus.toLowerCase() == "cancelled") { %> class="badge badge-pill bg-warning" <% } %> 
+                                                ><%= order[0]?.orderStatus %></span>   
+                                            <% } %>
+                                        </p>
+                                    </div>
+                                </article>
+                            </div> <!-- col// -->
+                            <div class="col-md-4">
+                                <article class="icontext align-items-start">
+                                    <span class="icon icon-sm rounded-circle bg-primary-light">
+                                        <i class="text-primary material-icons md-place"></i>
+                                    </span>
+                                    <div class="text">
+                                        <h6 class="mb-1">Deliver to</h6>
+                                        <p class="mb-1">
+                                            Name: <%= order[0]?.shippingAddress?.customerName %><br>
+                                            <%= order[0]?.shippingAddress?.addressLine1 %>, <%= order[0]?.shippingAddress?.addressLine2 %><br>
+                                            City: <%= order[0]?.shippingAddress?.city %>, <%= order[0]?.shippingAddress?.state %>, <%= order[0]?.shippingAddress?.country %> <br>
+                                            Pincode: <%= order[0]?.shippingAddress?.pincode %>
+                                        </p>
+                                        <!-- <a href="#">View profile</a> -->
+                                    </div>
+                                </article>
+                            </div> <!-- col// -->
+                        </div> <!-- row // -->
+                        <div class="row">
+                            <div class="col-lg-7">
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th width="40%">Product</th>
+                                                <th width="20%">Unit Price</th>
+                                                <th width="20%">Quantity</th>
+                                                <th width="20%" class="text-end">Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>                                  
+                                            <% for (let i = 0; i < order.length; i++) { %>
+                                            <tr>
+                                                <td>
+                                                    <a class="itemside" href="/<%= order[i].productInfo[0]?.category%>/<%= order[i]?.products?.prductId %>" target="_blank">
+                                                        <div class="left">
+                                                            <img src="/img/products/<%= order[i]?.productInfo[0]?.images[0] %>" width="" height="40" class="img-xs" alt="Item">
+                                                        </div>
+                                                        <div class="info"><%= order[i].productInfo[0]?.productName %></div>
+                                                    </a>
+                                                </td>
+                                                <td> ₹<%= order[i]?.products?.salePrice %> </td>
+                                                <td> <%= order[i].products?.quantity %> </td>
+                                                <td class="text-end"> ₹<%= order[i].products?.quantity * order[i]?.products?.salePrice %> </td>
+                                            </tr>
+                                            <% }  %>
+                                            <tr>
+                                                <td colspan="4">
+                                                    <article class="float-end">
+                                                        <dl class="dlist">
+                                                            <dt>Subtotal:</dt>
+                                                            <dd>₹ <%= order[0]?.totalAmount %></dd>
+                                                        </dl>
+                                                        <dl class="dlist">
+                                                            <dt>Shipping cost:</dt>
+                                                            <dd>₹ <%= order[0]?.shippingCost || '0' %></dd>
+                                                        </dl>
+                                                        </dl>
+                                                        <dl class="dlist">
+                                                            <dt>Discount:</dt>
+                                                            <dd>- ₹ <%= order[0]?.discount || '0' %></dd>
+                                                        </dl>
+                                                        <dl class="dlist">
+                                                            <dt>Grand total:</dt>
+                                                            <dd> <b class="h5">₹ <%= order[0]?.finalAmount %></b> </dd>
+                                                        </dl>
+                                                        <dl class="dlist">
+                                                            <dt class="text-muted">Payment status:</dt>
+                                                            <dd>
+                                                                <% if(typeof order[0]?.paymentStatus === 'string') { %>
+                                                                    <span 
+                                                                    <% if (order[0]?.paymentStatus.toLowerCase() == "pending") { %> class="badge badge-pill bg-info"
+                                                                    <% } else if (order[0]?.paymentStatus.toLowerCase() == "paid") { %> class="badge badge-pill bg-success"
+                                                                    <% } else if (order[0]?.paymentStatus.toLowerCase() == "not paid") { %> class="badge badge-pill bg-danger"
+                                                                    <% } else if (order[0]?.paymentStatus.toLowerCase() == "refunded") { %> class="badge badge-pill bg-warning" <% } %> 
+                                                                    ><%= order[0]?.paymentStatus %></span>   
+                                                                <% } %>
+                                                            </dd>
+                                                        </dl>
+                                                    </article>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div> <!-- table-responsive// -->
+                                <!-- <a class="btn btn-primary" href="#">View Order Tracking</a> -->
+                            </div> <!-- col// -->
+                            <div class="col-lg-1"></div>
+                            <div class="col-lg-4">
+                                <div class="box shadow-sm bg-light">
+                                    <h6 class="mb-15">Payment info</h6>
+                                    <p>
+                                        <!-- <img src="/assets2/imgs/card-brands/2.png" class="border" height="20"> Master Card **** **** 4768 <br>
+                                        Business name: Grand Market LLC <br>
+                                        Phone: +1 (800) 555-154-52 -->
+                                        <%= order[0]?.paymentMethod %><br>
+                                    </p>
+                                    <% if(locals.order[0]?.paymentDetails?.razorpay_payment_id) { %>
+                                        <p>Refecrence ID: <%= order[0]?.paymentDetails?.razorpay_payment_id %></p>
+                                    <% } %>
+                                    <% if(locals.order[0]?.paymentDetails?.walletBalance) { %>
+                                        <p> Wallet balance: <%= order[0]?.paymentDetails?.walletBalance %></p>
+                                    <% } %>
+                                    <% if(locals.order[0]?.coupon) { %>
+                                        <p> Coupon Used: <%= order[0]?.coupon %></p>
+                                    <% } %>
+                                </div>
+                                <div class="h-25 pt-4">
+                                    <div class="mb-3">
+                                        <label>Notes:</label>
+                                        <p><%= order[0]?.shippingAddress?.notes %></p>
+                                    </div>
+                                    <% if (locals.order[0]?.reason) { %>
+                                        <div class="mb-3">
+                                            <label>Reason:</label>
+                                            <p><%= order[0]?.reason %></p>
+                                        </div>                                     
+                                    <% } %>
+                                    <!-- <button class="btn btn-primary">Save note</button> -->
+                                </div>
+                            </div> <!-- col// -->
+                        </div>
+                    </div> <!-- card-body end// -->
+                </div> <!-- card end// -->
+                <% }  %>
+            </div>
+        </section> <!-- content-main end// -->
+    </main>
+
+    <!-- Modal for Order Cancel & Return -->
+    <div class="modal fade" id="reasonModal" tabindex="-1" aria-labelledby="reasonModalLabel" aria-hidden="true">
+        <div class="modal-dialog  modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="reasonModalLabel">New message</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-center reason-prompt">Are you sure you want to cancel this order? <br>Please do mention a reason for cancelling the order.</p>
+              <form id="reasonForm" action="/cancel-order" method="post">
+                <div class="mb-3">
+                  <input type="hidden" class="form-control" id="orderId" name="orderId">
+                </div>
+                <div class="mb-3">
+                  <label for="reason" class="col-form-label">Reason :</label>
+                  <textarea class="form-control" id="reason" name="reason" placeholder="Please enter a reason..." required></textarea>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" form="reasonForm" class="btn btn-primary">Submit & Confirm</button>
+            </div>
+          </div>
+        </div>
+    </div>
+    <!-- End of Modal for Order Cancel & Return -->
+
+    <!-- Footer -->
+    <%- include('./partials/home/home-footer.ejs') %>
+
+    <!-- Preloader Start -->
+    <%- include('./partials/home/home-preloader.ejs') %> 
+     
+    <!-- Custom Alert -->
+    <%- include('./partials/home/custom-alert.ejs') %>
+    
+    <!-- Vendor JS-->
+    <script src="/assets/js/vendor/modernizr-3.6.0.min.js"></script>
+    <script src="/assets/js/vendor/jquery-3.6.0.min.js"></script>
+    <script src="/assets/js/vendor/jquery-migrate-3.3.0.min.js"></script>
+    <script src="/assets/js/vendor/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/plugins/slick.js"></script>
+    <script src="/assets/js/plugins/jquery.syotimer.min.js"></script>
+    <script src="/assets/js/plugins/wow.js"></script>
+    <script src="/assets/js/plugins/jquery-ui.js"></script>
+    <script src="/assets/js/plugins/perfect-scrollbar.js"></script>
+    <script src="/assets/js/plugins/magnific-popup.js"></script>
+    <script src="/assets/js/plugins/select2.min.js"></script>
+    <script src="/assets/js/plugins/waypoints.js"></script>
+    <script src="/assets/js/plugins/counterup.js"></script>
+    <script src="/assets/js/plugins/jquery.countdown.min.js"></script>
+    <script src="/assets/js/plugins/images-loaded.js"></script>
+    <script src="/assets/js/plugins/isotope.js"></script>
+    <script src="/assets/js/plugins/scrollup.js"></script>
+    <script src="/assets/js/plugins/jquery.vticker-min.js"></script>
+    <script src="/assets/js/plugins/jquery.theia.sticky.js"></script>
+    <!-- Template  JS -->
+    <script src="/assets/js/main.js?v=3.4"></script>
+    <script src="/js/custom-alert.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/easyinvoice/dist/easyinvoice.min.js"></script>
+    <!-- Downloading Invoice -->
+    <script>
+        function downloadInvoice(){
+            $.ajax({
+                url:"/user/download-invoice/<%= order[0]?._id %>",
+                method:'get',
+                success:async (data)=>{
+                    if(data){
+                        // customAlert("Hi there...!","Downloading invoice. Please check downloads");
+                        showNotification();
+                        await easyinvoice.createInvoice(data, function (result) {
+                            easyinvoice.download('Order Invoice.pdf', result.pdf);
+                        });                        
+                    } else{
+                        customAlert("Oops...!","Unable to download invoice right now. Please try again later.");
+                    }
+                }
+            });
+        }
+
+        function showNotification() {
+            const notification = document.getElementById("notification");
+            notification.style.display = "block";
+            setTimeout(()=>{ notification.style.display = "none"; }, 3000);
+        }
+    </script>    
+    <!-- Resoning cancel & returning -->
+    <script>
+        const reasonModal = document.getElementById('reasonModal')
+        reasonModal.addEventListener('show.bs.modal', function (event) {            
+            const button = event.relatedTarget;
+
+            const title = button.getAttribute('data-bs-title');
+            const action = button.getAttribute('data-bs-route');
+            const orderId = button.getAttribute('data-bs-orderid');
+
+            const modalTitle = reasonModal.querySelector('.modal-title');
+            const prompt = reasonModal.querySelector('.reason-prompt');
+            const orderIdInput = document.getElementById('orderId');
+            
+            modalTitle.textContent = title + ' Order';
+            $('#reasonForm').attr('action', action);
+            prompt.innerHTML = "Are you sure you want to " + title.toLowerCase() + " this order? <br>Please do mention a reason for doing the order.";
+            orderIdInput.value = orderId;
+        })
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Cart</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="/assets/imgs/theme/favicon.svg">
+    <!-- Template CSS -->
+    <link rel="stylesheet" href="/assets/css/main.css?v=3.4">
+    <link rel="stylesheet" href="/css/custom-alert.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <%- include('./partials/home/home-header.ejs', {currTab: 'shop'}) %>
+    <!-- Mobile Header -->
+    <%- include('./partials/home/home-mobile-header.ejs', {currTab: 'shop'}) %>
+    
+    <main class="main">
+        <div class="page-header breadcrumb-wrap">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="/" rel="nofollow">Home</a>
+                    <span></span> Shop
+                    <span></span> Your Cart
+                </div>
+            </div>
+        </div>
+        <section class="mt-10 mb-50">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="table-responsive">
+                            <table class="table shopping-summery text-center clean">
+                                <thead>
+                                    <tr class="main-heading">
+                                        <th scope="col">Image</th>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Stock</th>
+                                        <th scope="col">Price</th>
+                                        <th scope="col">Quantity</th>
+                                        <th scope="col">Subtotal</th>
+                                        <th scope="col">Remove</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% let flag = 0; %> 
+                                    <% if (locals.cartItems) { %>                                                                        
+                                        <% for (let i = 0; i < cartItems.length; i++) { %>
+                                    <tr>
+                                        <td class="image product-thumbnail"><img src="/img/products/<%= cartItems[i].productInfo[0].images[0] %>" alt="#"></td>
+                                        <td class="product-des product-name">
+                                            <h4 class="product-name"><a href="/<%= cartItems[i].productInfo[0].category%>/<%= cartItems[i].productInfo[0]._id %>"><%= cartItems[i].productInfo[0].productName %></a></h4>
+                                            <p class="font-xs"><%= cartItems[i].productInfo[0].brand %> - <%= cartItems[i].productInfo[0].category %> </p>
+                                        </td>
+                                        <td class="text-center" data-title="Stock">
+                                            <% if (cartItems[i]?.productInfo[0].stock > 0) { %>
+                                                <span class="color3 font-weight-bold">In Stock</span>                                             
+                                            <% } else { %>
+                                                <span class="text-danger font-weight-bold">Out of stock</span>
+                                                <% flag = 1 %>
+                                            <% } %> 
+                                        </td>
+                                        <td class="price" data-title="Price">₹<span id="itemPrice<%= i %>" ><%= cartItems[i].salePrice %></span></td>
+                                        <td class="text-center" data-title="Stock">
+                                            <a id="itemDown<%= i %>" onclick="changeQuantity('<%= i %>', '<%= cartItems[i]._id %>','<%= cartItems[i].productInfo[0]._id %>',-1)" class="btn-primary-outline m-auto mx-1 py-0 px-1" style="font-weight: 700; font-size: 18px;">-</a>
+                                            <span id="itemQty<%= i %>" class="qty-val" ><%= cartItems[i].quantity %> </span>
+                                            <a id="itemUp<%= i %>" onclick="changeQuantity('<%= i %>', '<%= cartItems[i]._id %>','<%= cartItems[i].productInfo[0]._id %>', 1)" class="btn-primary-outline m-auto mx-1 py-0 px-1" style="font-weight: 700; font-size: 17px;">+</a>
+                                            <!-- <div class="detail-qty border radius  m-auto">
+                                                <a onclick="changeQuantity('<%= cartItems[i]._id %>','cartItems[i].productInfo[0]._id', 1)" class="qty-down"><i class="fi-rs-angle-small-down"></i></a>
+                                                <span class="qty-val"><%= cartItems[i].quantity %> </span>
+                                                <a onclick="changeQuantity('<%= cartItems[i]._id %>','cartItems[i].productInfo[0]._id',-1)" class="qty-up"><i class="fi-rs-angle-small-up"></i></a>
+                                            </div> -->
+                                        </td>
+                                        <td class="text-right" data-title="Cart">
+                                            <span id="itemSubTotal<%= i %>">₹<%= cartItems[i].salePrice * cartItems[i].quantity %></span>
+                                        </td>
+                                        <td class="action" data-title="Remove"><a href="/remove-cart-item/<%= cartItems[i].productInfo[0]._id %>" class="text-muted"><i class="fi-rs-trash"></i></a></td>
+                                    </tr>
+                                        <% } %>
+                                        <% if(cartItems.length === 0) { %> 
+                                            <tr>
+                                                <td colspan="6" class="text-end">
+                                                    <h6 class="h6 text-center mt-20 mb-20">No items in cart. Cart is empty!</h6>
+                                                </td>
+                                            </tr>
+                                            <% } %>   
+                                    <% }  %>
+                                    <tr>
+                                        <td colspan="6" class="text-end">
+                                            <!-- <a href="#" class="text-muted"> <i class="fi-rs-cross-small"></i> Clear Cart</a> -->
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="cart-action text-end">
+                            <!-- <a class="btn  mr-10 mb-sm-15"><i class="fi-rs-shuffle mr-10"></i>Update Cart</a> -->
+                            <a class="btn-primary-outline me-4" href="/"><i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping</a>
+                            <% if (locals.cartItems) { %><% if(cartItems.length > 0) { %>
+                                <a class="btn ms-3" <% if (flag === 1) { %>style="background-color:grey" onclick="customAlert('Oops..!', 'Some items are out of stock! Remove them to continue to checkout.')"<% } else { %>href="/checkout"<% } %>> 
+                                    <i class="fi-rs-box-alt mr-10"></i> 
+                                    Proceed To CheckOut
+                                </a>
+                            <% } %><% }  %>
+                        </div>
+                        <div class="divider center_icon mt-10 mb-10"><i class="fi-rs-fingerprint"></i></div>
+                        <div class="row mb-10">
+                            <div class="col-lg-6 col-md-12"></div>
+                            <% if (locals.cartItems) { %><% if(cartItems.length > 0) { %>
+                            <div class="col-lg-6 col-md-12">
+                                <div class="border p-md-4 p-30 border-radius cart-totals">
+                                    <div class="heading_s1 mb-3">
+                                        <h4>Cart Totals</h4>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table">
+                                            <tbody>
+                                                <tr>
+                                                    <td class="cart_total_label">Cart Subtotal</td>
+                                                    <td class="cart_total_amount font-lg fw-900 text-brand">₹<span id="subTotal"  class="">
+                                                        <% if(locals.subTotal) { %> <%= subTotal %> <% } %>
+                                                        </span></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="cart_total_label">Shipping</td>
+                                                    <td class="cart_total_amount"> <i class="ti-gift mr-5"></i> Free Shipping</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="cart_total_label">Total</td>
+                                                    <td class="cart_total_amount font-xl text-brand"><strong>₹<span id="totalAmt" class="fw-900"><% if(locals.subTotal) { %> <%= subTotal %> <% } %></span></strong></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <a class="btn ms-3" <% if (flag === 1) { %>style="background-color:grey" onclick="customAlert('Oops..!', 'Some items are out of stock! Remove them to continue to checkout.')"<% } else { %>href="/checkout"<% } %>> 
+                                        <i class="fi-rs-box-alt mr-10"></i> 
+                                        Proceed To CheckOut
+                                    </a>
+                                </div>
+                            </div>
+                            <% } %><% }  %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <!-- Footer -->
+    <%- include('./partials/home/home-footer.ejs') %>
+    <!-- Preloader Start -->
+    <!-- <%- include('./partials/home/home-preloader.ejs') %>   -->
+    <!-- Custom Alert -->
+    <%- include('./partials/home/custom-alert.ejs') %>
+    <!-- Vendor JS-->
+    <script src="/assets/js/vendor/modernizr-3.6.0.min.js"></script>
+    <script src="/assets/js/vendor/jquery-3.6.0.min.js"></script>
+    <script src="/assets/js/vendor/jquery-migrate-3.3.0.min.js"></script>
+    <script src="/assets/js/vendor/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/plugins/slick.js"></script>
+    <script src="/assets/js/plugins/jquery.syotimer.min.js"></script>
+    <script src="/assets/js/plugins/wow.js"></script>
+    <script src="/assets/js/plugins/jquery-ui.js"></script>
+    <script src="/assets/js/plugins/perfect-scrollbar.js"></script>
+    <script src="/assets/js/plugins/magnific-popup.js"></script>
+    <script src="/assets/js/plugins/select2.min.js"></script>
+    <script src="/assets/js/plugins/waypoints.js"></script>
+    <script src="/assets/js/plugins/counterup.js"></script>
+    <script src="/assets/js/plugins/jquery.countdown.min.js"></script>
+    <script src="/assets/js/plugins/images-loaded.js"></script>
+    <script src="/assets/js/plugins/isotope.js"></script>
+    <script src="/assets/js/plugins/scrollup.js"></script>
+    <script src="/assets/js/plugins/jquery.vticker-min.js"></script>
+    <!-- Template  JS -->
+    <script src="/assets/js/main.js?v=3.4"></script>
+    <script src="/assets/js/shop.js?v=3.4"></script>
+    <script src="/js/custom-alert.js"></script>
+    <script>
+        function changeQuantity(i, cartId, prodId, newCount){
+            const labelId = '#itemQty' + i; 
+            console.log("Clicked : " + newCount);
+            let initialCount = $(labelId).text();
+            if(initialCount < Number(2) && newCount === -1)
+                return;
+            $.ajax({
+                url:'/change-cart-item-quantity',
+                data : {
+                    cartId: cartId,
+                    prodId: prodId,
+                    count: newCount,
+                },
+                method: 'POST',
+                success: function(response){
+                    
+                    const itemPriceId = '#itemPrice' + i; 
+                    const itemSubTotalId = '#itemSubTotal' + i;
+                    const totalId = '#itemQty' + i;
+                    const btnDown = '#itemDown' + i;
+                    const btnUp = '#itemUp' + i;
+                    console.log(response);
+
+                    if(response.status){
+                        let count = $(labelId).text();
+                        count = parseInt(count) + Number(newCount);
+                        console.log("Count : " + count);
+                        //item label
+                        $(labelId).text(count);
+                        if(count < 2){$(btnDown).off('click');}
+                        else{$(btnDown).on('click');}
+                        //sub Total
+                        let subTotal = $('#subTotal').text();
+                        console.log("subTotal : " + subTotal);
+                        subTotal = parseInt(subTotal) + (parseInt(newCount) * parseInt($(itemPriceId).text()));
+                        console.log("subTotal : " + subTotal);
+                        $('#subTotal').text(subTotal);
+                        $('#totalAmt').text(subTotal);
+                        //item sub total
+                        let itemPrice = $(itemPriceId).text();
+                        itemPrice = parseInt(itemPrice) * count;
+                        console.log("Subtotal : " + itemPrice);
+                        $(itemSubTotalId).text('₹' + itemPrice);
+                        //cart item count
+                        let cartCount = $('#cartItemsCount').text();
+                        cartCount = parseInt(cartCount) + Number(newCount);
+                        console.log("Count : " + cartCount);
+                        $('#cartItemsCount').text(cartCount);
+                        
+                        
+                    } else {
+                        if(response.msg)
+                            //alert(response.msg);
+                            customAlert('Oops..!', response.msg);
+                        else
+                        customAlert('Oops..!', "Unable to change item quantity");
+                            //alert("Unable to change item quantity");
+                    }
+                },
+                error: function(){
+                    customAlert('Oops..!', "Unable to change item quantity");
+                }
+            })
+        } 
+    </script>
+</body>
+
+</html>

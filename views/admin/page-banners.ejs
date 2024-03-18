@@ -1,0 +1,390 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>banner Management</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="link" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="/assets2/imgs/theme/favicon.svg">
+    <!-- Template CSS -->
+    <link href="/assets2/css/main.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/css/dataTables.bootstrap4.min.css" integrity="sha512-PT0RvABaDhDQugEbpNMwgYBCnGCiTZMh9yOzUsJHDgl/dMhD9yjHAwoumnUk3JydV3QTcIkNDuN40CJxik5+WQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="/css/datatable.css">
+    <link rel="stylesheet" href="/css/custom-alert.css">
+</head>
+
+<body>
+    <%- include('./partials/admin/admin-side-nav.ejs', {currTab: 'banners'}) %>
+    <main class="main-wrap">
+        <%- include('./partials/admin/admin-header.ejs') %>
+        <section class="content-main">
+            <!-- Begin Page Content -->
+            <div class="container-fluid">
+                <!-- DataTales Example -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex row">                        
+                        <div class="col-6">
+                            <h6 class="my-auto font-weight-bold text-primary">Banner Management</h6>
+                        </div>
+                        <div class="col-6 text-end">
+                            <a class="btn btn-primary" id="btn-add-banner" data-bs-toggle="modal" data-bs-target="#myModal"
+                                data-modaltitle="<% if (locals.action) { %>Edit banner details<% } else { %>Add new banner<% } %>" 
+                                data-btnaction="<% if (locals.action) { %><%= action %><% } else { %>add<% } %>">
+                                <i class="material-icons md-plus"></i> Add Banner
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Image</th>
+                                        <th>Title</th>
+                                        <th>Description</th>
+                                        <th>Link</th>
+                                        <th>Location</th>
+                                        <th>Active</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                <% if (locals.banners) { %>                                    
+                                    <% for (let i = 0; i < banners.length; i++) { %>
+                                        <tr>
+                                          <td>
+                                            <div class="left d-none d-lg-block">
+                                                <img src="/img/banners/<%= banners[i].image %>" class="img-sm img-thumbnail" alt="Image">
+                                            </div>
+                                          </td>
+                                          <td><%= banners[i]?.title %></td>
+                                          <td><%= banners[i]?.description %></td>
+                                          <td><%= banners[i]?.link %></td>
+                                          <td><%= banners[i]?.location %></td>
+                                          <td>                                               
+                                            <% if(banners[i]?.isActive){ %>
+                                                <span class="badge rounded-pill alert-success">Visible</span>
+                                            <% } else{ %>  
+                                                <span class="badge rounded-pill alert-danger">Hidden</span>
+                                            <% } %>  
+                                          </td>                                         
+                                          <td>
+                                            <div class="col-lg-2 col-sm-2 col-4 col-action text-end d-flex">
+                                                <a class="ms-2 edit_button" id="edit-button" name="edit-btn"
+                                                        data-bs-toggle="modal" data-bs-target="#myModal" 
+                                                        data-btnaction="edit"
+                                                        data-modaltitle="Edit banner"
+                                                        data-id="<%= banners[i]?._id %>"
+                                                        data-title="<%= banners[i]?.title %>"
+                                                        data-description="<%= banners[i]?.description %>"
+                                                        data-image="<%= banners[i]?.image %>"
+                                                        data-link="<%= banners[i]?.link %>"
+                                                        data-location="<%= banners[i]?.location %>"
+                                                        data-isactive="<%= banners[i]?.isActive %>"
+                                                        >
+                                                    <span class="material-icons md-edit iconbtn" title="Edit <%= banners[i]?.code %>">
+                                                        <span style="color:#000000; font-size:small; font-family: Arial, Helvetica, sans-serif;"></span>
+                                                    </span>
+                                                </a>
+                                                <form id="hidden-form-<%= i %>" action="/admin/delete-banner" method="POST" style="display: none;">
+                                                  <input type="hidden" name="bannerID" value="<%= banners[i]?._id %>" />
+                                                </form>
+                                                <a class="ms-3 me-0" onclick="confirmDelete('hidden-form-<%= i %>', '<%= banners[i]?.title %>')">
+                                                    <span class=" material-icons md-delete_forever" title="Delete <%= banners[i]?.title %>">
+                                                        <span class="mb-2" style="color:#000000; font-size:small; font-family: Arial, Helvetica, sans-serif;"></span>
+                                                    </span>
+                                                </a>
+                                            </div>
+                                          </td>
+                                        </tr>    
+                                       <% } %>
+                                    <% }  %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.container-fluid -->   
+        </section> <!-- content-main end// -->
+        <!-- Modal for Edit button -->
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Edit banner details</h4>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <p id="errMsg" class="m-auto text-center text-danger my-1"><% if (locals.errMsg) { %><%= errMsg %><% } %></p>                        
+                    <form name="bannerForm" id="bannerForm" method="post" action="/admin/edit-banner" enctype="multipart/form-data">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <input type="hidden" class="form-control edit-id" name="id" <% if(locals.inputData) {%>  value = "<%= inputData?.id %>"  <% } %> >
+                            </div>
+                            <div class="form-group w-100">
+                                <label for="title">Title</label>
+                                <input class="form-control edit-title" id="bannerTitle" name="title" placeholder="Enter banner title" <% if(locals.inputData) {%>  value = "<%= inputData?.title %>"  <% } %> >
+                                <div class="error text-danger ms-2"></div>
+                            </div>
+                            <div class="form-group w-100">
+                                <label for="description">Description</label>
+                                <input class="form-control edit-description" id="description" name="description" placeholder="Enter banner description" <% if(locals.inputData) {%>  value = "<%= inputData?.description %>"  <% } %> >
+                                <div class="error text-danger ms-2"></div>
+                            </div>
+                            <div class="form-group mt-3">
+                                <label for="link">Link</label>
+                                <input class="form-control edit-link" id="link" name="link" placeholder="Enter link (url)" <% if(locals.inputData) {%>  value = "<%= inputData?.link %>"  <% } %> >
+                                <div class="error text-danger ms-2"></div>
+                            </div>  
+                            <div class="form-group mt-3">
+                                <label for="location">Location</label>
+                                <input class="form-control edit-location" id="location" name="location" placeholder="Enter location" <% if(locals.inputData) {%>  value = "<%= inputData?.location %>"  <% } %> >
+                                <div class="error text-danger ms-2"></div>
+                            </div>  
+                            <div class="form-group mt-3">
+                                <label for="flexSwitchCheckChecked">List</label>
+                                <div class="form-control form-switch">
+                                    <input class="form-check-input ms-3  py-2 px-4" type="checkbox" role="switch" name="isActive" id="flexSwitchCheckChecked">
+                                </div>
+                            </div>
+                            <div class="form-group mt-3">
+                                <input type="hidden" class="form-control edit-isactive" id="active" name="active" placeholder="Is listed" required>
+                            </div>
+                            <div class="card-header">
+                                <h6>Banner Image</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="input-upload">
+                                    <div class="w-100 bg-light rounded-3 p-2 d-flex d-none">
+                                        <label for="image" class="custom-input-label py-2 px-3 ms-2 rounded-3 " style="font-size: 13px; background-color: #cfcfcf; color: #000000;"><span>Select Files</span></label>
+                                    </div>                               
+                                    <input class="form-control" type="file" id="image" name="image" accept="image/*"
+                                    <% if (locals.inputData) { %>
+                                        value="<%= inputData?.image %>"
+                                    <% } %> >
+                                    <div class="error text-danger"></div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="preview-images text-center">
+                                    <img id="previewImage" src="" class="img edit-image" alt="">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
+                        <button id="modal-save-btn" type="submit" onclick="confirmEdit('bannerForm')" class="btn btn-primary w-50">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End of Modal for Edit button -->
+        <!-- Custom Confirm Dialog -->
+        <%- include('./partials/home/custom-confirm-dialog.ejs') %>        
+        <!-- Footer -->
+        <%- include('./partials/admin/admin-footer.ejs') %>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="/assets2/js/vendors/bootstrap.bundle.min.js"></script>
+    <script src="/assets2/js/vendors/select2.min.js"></script>
+    <script src="/assets2/js/vendors/perfect-scrollbar.js"></script>
+    <script src="/assets2/js/vendors/jquery.fullscreen.min.js"></script>
+    <!-- Main Script -->
+    <script src="/assets2/js/main.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js" integrity="sha512-0QbL0ph8Tc8g5bLhfVzSqxe9GERORsKhIn1IrpxDAgUsbBGz/V7iSav2zzW325XGd1OMLdL4UiqRJj702IeqnQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Page level plugins -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js" integrity="sha512-BkpSL20WETFylMrcirBahHfSnY++H2O1W+UnEEO4yNIl+jI2+zowyoGJpbtk6bx97fBXf++WJHSSK2MV4ghPcg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap4.min.js" integrity="sha512-OQlawZneA7zzfI6B1n1tjUuo3C5mtYuAWpQdg+iI9mkDoo7iFzTqnQHf+K5ThOWNJ9AbXL4+ZDwH7ykySPQc+A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap4.min.js" integrity="sha512-OQlawZneA7zzfI6B1n1tjUuo3C5mtYuAWpQdg+iI9mkDoo7iFzTqnQHf+K5ThOWNJ9AbXL4+ZDwH7ykySPQc+A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="/js/custom-confirm.js"></script>
+    <!-- Page level custom scripts -->
+    <script>
+        const form = document.getElementById('bannerForm');
+        const title = document.getElementById('bannerTitle');
+        const description = document.getElementById('description');
+        const link = document.getElementById('link'); 
+        const bLocation = document.getElementById('location');
+        
+        const setError = (element, message) => {
+            const inputControl = element.parentElement;
+            const errorDisplay = inputControl.querySelector('.error');
+
+            errorDisplay.innerText = message;
+            inputControl.classList.add('error');
+            inputControl.classList.remove('success');
+        };
+        const setSuccess = element => {
+            const inputControl = element.parentElement;
+            const errorDisplay = inputControl.querySelector('.error');
+
+            errorDisplay.innerText = '';
+            inputControl.classList.add('success');
+            inputControl.classList.remove('error');
+        };
+        
+        function validateInputs() {
+            const titleValue = title.value.trim();
+            const descriptionValue = description.value.trim();
+            const linkValue = link.value.trim();
+            const locationValue = bLocation.value.trim();
+
+            if(titleValue === '') {
+                setError(title, 'Please enter banner title');
+                title.focus();
+                return false;
+            } else{
+                setSuccess(title);
+            }
+
+            if(descriptionValue === '') {
+                setError(description, 'Please enter banner description');
+                description.focus();
+                return false;
+            } else{
+                setSuccess(description);
+            }
+            
+            if(linkValue === '') {
+                setError(link, 'Please enter link (url)');
+                link.focus();
+                return false;
+            } else{
+                setSuccess(link);
+            }
+
+            if(locationValue === '') {
+                setError(bLocation, 'Please enter location');
+                bLocation.focus();
+                return false;
+            } else{
+                setSuccess(bLocation);
+            }
+
+            return true;
+        }
+
+        function submitEditForm(formID){
+            document.getElementById(formID).submit();
+            console.log("banner edit form SUBMITTED!!");
+        }
+
+        function confirmEdit(form) {
+            const button = document.getElementById('modal-save-btn');
+            const btnAction = button.innerHTML;
+
+            console.log('Login submit button recorded');
+            if(validateInputs()){
+                console.log("VALIDATION Success");
+                console.log("Action : " + btnAction);
+                if(btnAction === "Save changes"){                    
+                    customConfirm('Hey there!', 'Save the changes made to the banner ?', submitEditForm, form);
+                }
+                else{
+                    document.getElementById(form).submit();
+                }
+            } else{
+                console.log("Validation FAILED!");
+            }
+        }
+
+    </script>
+    <script>
+        // Call the dataTables jQuery plugin
+        $(document).ready(function() {
+            $('#dataTable').DataTable({
+                order: [[1, 'desc']],
+                columnDefs: [{ "targets": [0,2,3,6], "orderable": false }]
+            });
+        });    
+
+        let selectedFiles = [];
+
+        $("#image").on("change", function() {
+            selectedFiles = Array.from(this.files);
+            imagesPreview(".preview-images");   
+        });
+  
+        let imagesPreview = function(placeToInsertImagePreview) {
+            $(placeToInsertImagePreview).empty();    
+            if (selectedFiles) {
+                for (let i = 0; i < selectedFiles.length; i++) {
+                    let reader = new FileReader();
+                    reader.onload = function(event) {
+                        let imagePreview = document.createElement('div');
+                        imagePreview.classList.add('img');
+  
+                        let img = document.createElement('img');
+                        img.src = event.target.result;
+  
+                        imagePreview.appendChild(img);
+  
+                        $(placeToInsertImagePreview).append(imagePreview);
+                    };
+                    reader.readAsDataURL(selectedFiles[i]);
+                }
+            }
+        };
+
+        function confirmDelete(formID, name) {
+            customConfirm('Hey there!', `Are you sure to delete the banner '${name}'?`, submitDeleteForm, formID);
+        }
+        function submitDeleteForm(formID){
+            document.getElementById(formID).submit();
+            console.log("banner delete form SUBMITTED!!");
+        }
+        
+        $(document).on( "click", '.edit_button',function(e) {
+            const id = $(this).data('id');
+            const title = $(this).data('title');
+            const description = $(this).data('description');
+            const link = $(this).data('link');
+            const location = $(this).data('location');
+            const isactive = $(this).data('isactive');
+            const image = $(this).data('image');
+
+            console.log(isactive);
+            $(".edit-id").val(id);
+            $(".edit-title").val(title);
+            $(".edit-description").val(description);
+            $(".edit-link").val(link);
+            $(".edit-location").val(location);
+            $(".edit-isactive").val(isactive);
+            if(isactive === true)
+                document.getElementById("flexSwitchCheckChecked").setAttribute("checked", "checked");
+
+            document.getElementById("previewImage").setAttribute("src", "/img/banners/" + image);
+        });
+
+        $('#myModal').on('show.bs.modal', function (event) {
+            let button = $(event.relatedTarget); // Button that triggered the modal
+            let btnAction = button.data('btnaction');
+            console.log(btnAction);
+            let title = button.data('modaltitle');
+            let recipient = button.data('title') || "";             
+            let modal = $(this);
+            modal.find('.modal-title').text(title + " " + recipient);
+            
+            if( btnAction === "add" ) {  
+                $('#bannerForm').attr('action', '/admin/add-banner');
+                document.getElementById("flexSwitchCheckChecked").setAttribute("checked", "checked");
+                $('#modal-save-btn').text('Add banner');
+                document.getElementById("bannerForm").reset();
+                document.getElementById("previewImage").setAttribute("src", "");
+            }
+            else if( btnAction === "edit" ) {
+                $('#bannerForm').attr('action', '/admin/edit-banner');
+                $('#modal-save-btn').text('Save changes');
+            }
+            $('#bannerTitle').trigger('focus');
+        });
+    </script>
+</body>
+
+</html>

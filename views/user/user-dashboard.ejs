@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title><%- navTitle %></title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="/assets/imgs/theme/favicon.svg">
+    <!-- Template CSS -->
+    <link rel="stylesheet" href="/assets/css/main.css?v=3.4">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/css/dataTables.bootstrap4.min.css" integrity="sha512-PT0RvABaDhDQugEbpNMwgYBCnGCiTZMh9yOzUsJHDgl/dMhD9yjHAwoumnUk3JydV3QTcIkNDuN40CJxik5+WQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="/css/custom-alert.css">
+</head>
+
+<body>   
+    <!-- Header -->
+    <%- include('./partials/user/user-header.ejs', {currTab: 'dashboard'}) %>
+    <!-- Mobile Header -->
+    <%- include('./partials/user/user-mobile-header.ejs', {currTab: 'dashboard'}) %>
+    
+    <main class="main">
+        <div class="page-header breadcrumb-wrap">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="/user" rel="nofollow">Home</a>
+                    <span></span> Account
+                </div>
+            </div>
+        </div>
+        <section class="pt-25 pb-100">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-10 m-auto">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="dashboard-menu" data-opentab="<%if(locals.openTab) { %><%= openTab %><% } else { %>dashboard<% } %>">
+                                    <ul class="nav flex-column" role="tablist">
+                                        <li class="nav-item">
+                                            <a class="nav-link active" id="dashboard-tab" data-bs-toggle="tab" href="#dashboard" role="tab" aria-controls="dashboard" aria-selected="false"><i class="fi-rs-settings-sliders mr-10"></i>Dashboard</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="orders-tab" data-bs-toggle="tab" href="#orders" role="tab" aria-controls="orders" aria-selected="false"><i class="fi-rs-shopping-bag mr-10"></i>Orders</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="address-tab" data-bs-toggle="tab" href="#address" role="tab" aria-controls="address" aria-selected="true"><i class="fi-rs-marker mr-10"></i>My Address</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="wallet-tab" data-bs-toggle="tab" href="#wallet" role="tab" aria-controls="wallet" aria-selected="true"><i class="fi-rs-smartphone mr-10"></i>My Wallet</a>
+                                        </li>
+                                        <!-- <li class="nav-item">
+                                            <a class="nav-link" id="account-detail-tab" data-bs-toggle="tab" href="#account-detail" role="tab" aria-controls="account-detail" aria-selected="true"><i class="fi-rs-user mr-10"></i>Account details</a>
+                                        </li> -->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="/user/logout"><i class="fi-rs-sign-out mr-10"></i>Logout</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="tab-content dashboard-content">
+                                    <div class="tab-pane fade active show" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="mb-0">Hello <%- user.firstName %>! </h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <p>From your account dashboard. you can easily check &amp; view your <a href="#orders">recent orders</a>, manage your <a href="#address">shipping and billing addresses</a> and <a href="#">edit your password and account details.</a></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="mb-0">Your Orders</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="table-responsive">
+                                                    <table class="table" id="orderTable">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Date</th>
+                                                                <th>Order Status</th>
+                                                                <th>Total</th>
+                                                                <th>Payment Status</th>
+                                                                <th>Actions</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <% if (locals.orders) { %>                                    
+                                                                <% for (let i = 0; i < orders.length; i++) { %>
+                                                            <tr>
+                                                                <td>
+                                                                    <%= orders[i]?.createdAt.toLocaleDateString() %><br>
+                                                                    <%= orders[i]?.createdAt.toLocaleTimeString() %>
+                                                                </td>
+                                                                <td><%= orders[i]?.orderStatus %></td>
+                                                                <td>₹ <strong><%= orders[i]?.totalAmount %></strong><br> for <%= orders[i]?.totalItems %> items</td>
+                                                                <td><%= orders[i]?.paymentStatus %></td>
+                                                                <td>
+                                                                    <a href="/user/view-order/<%= orders[i]?._id %>" class="btn-small d-block">View</a>
+                                                                    <% if(orders[i]?.orderStatus !== "DELIVERED" && orders[i]?.orderStatus !== "CANCELLED" && orders[i]?.orderStatus !== "RETURNED") { %>
+                                                                        <a class="btn-small d-inline-block" data-bs-toggle="modal" data-bs-target="#reasonModal" data-bs-title="Cancel" data-bs-route="/user/cancel-order" data-bs-orderid="<%= orders[i]?._id %>">Cancel</a>
+                                                                        <!-- Return Period 14 Days :- new Date(orders[i]?.createdAt).setDate(new Date().getDate()+1) > Date.now() -->
+                                                                        <!-- Return Period 5 mins :- new Date(orders[i]?.createdAt.getTime() + 5*60000) -->
+                                                                        <% } else if(new Date(orders[i]?.createdAt.getTime() + 60*60000) > Date.now() && orders[i]?.orderStatus !== "CANCELLED" && orders[i]?.orderStatus !== "RETURNED") { %>
+                                                                        <a class="btn-small d-inline-block" data-bs-toggle="modal" data-bs-target="#reasonModal" data-bs-title="Return" data-bs-route="/user/return-order" data-bs-orderid="<%= orders[i]?._id %>">Return</a>
+                                                                    <% } %>
+                                                                </td>
+                                                            </tr>
+                                                                <% } %>
+                                                            <% }  %>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>  
+                                    <div class="tab-pane fade" id="address" role="tabpanel" aria-labelledby="address-tab">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <div class="row d-flex">
+                                                    <div class="col-6">
+                                                        <h5 class="mb-0">Manage Addresses</h5>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <a href="/user/add-new-address" class="btn btn-primary add_address_button p-2 float-end" data-bs-toggle="modal" data-bs-target="#addAddress"
+                                                            data-modaltitle="Add new address" data-btnaction="add">
+                                                            <i class="material-icons md-plus"></i> Add new address
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card-body">                                                
+                                                <div class="row">
+                                                    <% if (locals.addresses) { %>                                    
+                                                        <% for (let i = 0; i < addresses.length; i++) { %>
+                                                    <div class="col-lg-6">
+                                                        <div class="card mb-3 mb-lg-0">
+                                                            <div class="card-header">
+                                                                <h5 class="mb-0">Address <%= i+1 %> 
+                                                                    <% if(addresses[i]?.isDefault) { %> <span class=" float-end text-success">Default</span> <% } %>
+                                                                </h5>                                                        
+                                                            </div>
+                                                            <div class="card-body">
+                                                                <p><strong><%= addresses[i]?.customerName %></strong></p>
+                                                                <address>
+                                                                    <%= addresses[i]?.addressLine1 %><br>
+                                                                    <% if(addresses[i]?.addressLine2) { %><%= addresses[i]?.addressLine2 %>,<br><% } %>
+                                                                    <%= addresses[i]?.city %>, <%= addresses[i]?.state %><br>
+                                                                    <%= addresses[i]?.pincode %>
+                                                                </address>
+                                                                <p>Email: <%= addresses[i]?.email %></p>
+                                                                <address>Phone: <%= addresses[i]?.phone %></address>                                                        
+                                                                <a class="btn-small edit_address_button" id="edit-address-button"
+                                                                    data-bs-toggle="modal" data-bs-target="#addAddress" 
+                                                                    data-btnaction="edit"
+                                                                    data-modaltitle="Edit address"
+                                                                    data-id="<%= addresses[i]?._id %>"
+                                                                    data-customername="<%= addresses[i]?.customerName %>"
+                                                                    data-addressline1="<%= addresses[i]?.addressLine1 %>"
+                                                                    data-addressline2="<%= addresses[i]?.addressLine2 %>"
+                                                                    data-city="<%= addresses[i]?.city %>"
+                                                                    data-state="<%= addresses[i]?.state %>"
+                                                                    data-country="<%= addresses[i]?.country %>"
+                                                                    data-pincode="<%= addresses[i]?.pincode %>"
+                                                                    data-email="<%= addresses[i]?.email %>"
+                                                                    data-phone="<%= addresses[i]?.phone %>"
+                                                                    data-notes="<%= addresses[i]?.notes %>"
+                                                                    data-isdefault="<%= addresses[i]?.isDefault %>"
+                                                                    > 
+                                                                    <span title="Edit Address <%= i+1 %>">
+                                                                        Edit
+                                                                    </span>
+                                                                </a>
+                                                                <form id="hidden-form-<%= i %>" action="/user/delete-address" method="POST" style="display: none;">
+                                                                    <input type="hidden" name="addressId" value="<%= addresses[i]?._id %>" />
+                                                                </form>
+                                                                <a  onclick="confirmDeleteAddress('hidden-form-<%= i %>', 'Address <%= i+1 %>')" class="btn-small ms-5">
+                                                                    <span title="Delete Address <%= i+1 %>">Delete</span>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                        <% } %>
+                                                    <% }  %>                                            
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="wallet" role="tabpanel" aria-labelledby="wallet-tab">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <div class="row d-flex">
+                                                    <div class="col-6">
+                                                        <h5 class="mb-0 float-left">Your Wallet</h5>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <h5 class="mb-0 float-end">Wallet balance : ₹<span id="walletBalance"><% if(locals.walletBalance) { %> <%= walletBalance %> <% } else { %> 0 <% } %></span></h5>
+                                                    </div>
+                                                </div>
+                                            </div>                                        
+                                              
+                                            <div class="card-body">
+                                                <div class="table-responsive">
+                                                    <div class="row mb-5 w-100">
+                                                        <% if (locals.walletDetails) { %>
+                                                            <% if (walletDetails.length > 0) { %> 
+                                                                 <h5 class="col">Wallet Transactions</h5>
+                                                            <% } %>
+                                                        <% } %>
+                                                        <div class="col">
+                                                            <a id="add-to-wallet-btn" class="btn btn-primary float-end" data-bs-toggle="modal" data-bs-target="#addToWalletModal">
+                                                                <i class="material-icons md-plus"></i> Add money to wallet
+                                                            </a>
+                                                        </div>
+                                                    </div>    
+                                                    <% if (locals.walletDetails) { %> 
+                                                        <% if (walletDetails.length > 0) { %>                                                  
+                                                    <table class="table" id="walletTable"> 
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Date</th>
+                                                                <th>Amount</th>
+                                                                <th>Type</th>
+                                                                <th>Remarks</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>                                  
+                                                                <% for (let i = 0; i < walletDetails.length; i++) { %>
+                                                                <tr>
+                                                                    <td>
+                                                                        <%= walletDetails[i]?.timestamp.toLocaleDateString() %>
+                                                                        <%= walletDetails[i]?.timestamp.toLocaleTimeString() %>
+                                                                    </td>
+                                                                    <td>₹ <%= walletDetails[i]?.amount %></td>
+                                                                    <td>
+                                                                        <span style="font-size: 14px;">
+                                                                            <% if (walletDetails[i]?.transaction === "C") { %> CREDIT
+                                                                            <% } else if (walletDetails[i]?.transaction === "D") { %> DEBIT <% } %>                                                                            
+                                                                        </span>
+                                                                    </td>                                                                    
+                                                                    <td><%= walletDetails[i]?.remarks %></td>
+                                                                </tr>
+                                                                <% } %>
+                                                        </tbody>
+                                                    </table>
+                                                        <% } %>
+                                                    <% } %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- <div class="tab-pane fade" id="account-detail" role="tabpanel" aria-labelledby="account-detail-tab">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5>Account Details</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <p>Already have an account? <a href="page-login-register.html">Log in instead!</a></p>
+                                                <form method="post" name="enq">
+                                                    <div class="row">
+                                                        <div class="form-group col-md-6">
+                                                            <label>First Name <span class="required">*</span></label>
+                                                            <input required="" class="form-control square" name="name" type="text">
+                                                        </div>
+                                                        <div class="form-group col-md-6">
+                                                            <label>Last Name <span class="required">*</span></label>
+                                                            <input required="" class="form-control square" name="phone">
+                                                        </div>
+                                                        <div class="form-group col-md-12">
+                                                            <label>Display Name <span class="required">*</span></label>
+                                                            <input required="" class="form-control square" name="dname" type="text">
+                                                        </div>
+                                                        <div class="form-group col-md-12">
+                                                            <label>Email Address <span class="required">*</span></label>
+                                                            <input required="" class="form-control square" name="email" type="email">
+                                                        </div>
+                                                        <div class="form-group col-md-12">
+                                                            <label>Current Password <span class="required">*</span></label>
+                                                            <input required="" class="form-control square" name="password" type="password">
+                                                        </div>
+                                                        <div class="form-group col-md-12">
+                                                            <label>New Password <span class="required">*</span></label>
+                                                            <input required="" class="form-control square" name="npassword" type="password">
+                                                        </div>
+                                                        <div class="form-group col-md-12">
+                                                            <label>Confirm Password <span class="required">*</span></label>
+                                                            <input required="" class="form-control square" name="cpassword" type="password">
+                                                        </div>
+                                                        <div class="col-md-12">
+                                                            <button type="submit" class="btn btn-fill-out submit" name="submit" value="Submit">Save</button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal for Order Cancel & Return -->
+    <div class="modal fade" id="reasonModal" tabindex="-1" aria-labelledby="reasonModalLabel" aria-hidden="true">
+        <div class="modal-dialog  modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="reasonModalLabel">New message</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-center reason-prompt">Are you sure you want to cancel this order? <br>Please do mention a reason for cancelling the order.</p>
+              <form id="reasonForm" action="/cancel-order" method="post">
+                <div class="mb-3">
+                  <input type="hidden" class="form-control" id="orderId" name="orderId">
+                </div>
+                <div class="mb-3">
+                  <label for="reason" class="col-form-label">Reason :</label>
+                  <textarea class="form-control" id="reason" name="reason" placeholder="Please enter a reason..." required></textarea>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" form="reasonForm" class="btn btn-primary">Submit & Confirm</button>
+            </div>
+          </div>
+        </div>
+    </div>
+    <!-- End of Modal for Order Cancel & Return -->
+    
+    <!-- Modal for Order View -->
+    <div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">View order details</h4>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End of Modal for Order View -->
+
+    <!-- Modal for Address Edit -->
+    <div class="modal fade" id="addAddress" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Add new address</h4>
+                    <button type="button" class="close rounded-3 border-0" data-bs-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <form name="addAddressForm" id="addAddressForm" method="post" action="">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <input type="text" id="customerName" name="customerName" placeholder="Customer name *" class="edit-customername" value="">
+                            <div class="error text-danger ms-2"></div>
+                        </div>
+                        <!-- <div class="form-group">
+                            <div class="custom_select w-50">
+                                <select class="form-control select-active">
+                                    <option value="">Select an option...</option>
+                                    <option value="AX">Aland Islands</option>
+                                    <option value="AF">Afghanistan</option>
+                                    <option value="AL">Albania</option>
+                                    <option value="DZ">Algeria</option>
+                                    <option value="AD">Andorra</option>
+                                    <option value="AO">Angola</option>
+                                    <option value="AI">Anguilla</option>
+                                    <option value="AQ">Antarctica</option>
+                                    <option value="AG">Antigua and Barbuda</option>
+                                    <option value="AR">Argentina</option>
+                                    <option value="AM">Armenia</option>
+                                    <option value="AW">Aruba</option>
+                                    <option value="AU">Australia</option>
+                                    <option value="AT">Austria</option>
+                                    <option value="AZ">Azerbaijan</option>
+                                    <option value="BS">Bahamas</option>
+                                    <option value="BH">Bahrain</option>
+                                    <option value="BD">Bangladesh</option>
+                                    <option value="BB">Barbados</option>
+                                    <option value="BY">Belarus</option>
+                                    <option value="PW">Belau</option>
+                                    <option value="BE">Belgium</option>
+                                    <option value="BZ">Belize</option>
+                                    <option value="BJ">Benin</option>
+                                    <option value="BM">Bermuda</option>
+                                    <option value="BT">Bhutan</option>
+                                    <option value="BO">Bolivia</option>
+                                    <option value="BQ">Bonaire, Saint Eustatius and Saba</option>
+                                    <option value="BA">Bosnia and Herzegovina</option>
+                                    <option value="BW">Botswana</option>
+                                    <option value="BV">Bouvet Island</option>
+                                    <option value="BR">Brazil</option>
+                                    <option value="IO">British Indian Ocean Territory</option>
+                                    <option value="VG">British Virgin Islands</option>
+                                    <option value="BN">Brunei</option>
+                                    <option value="BG">Bulgaria</option>
+                                    <option value="BF">Burkina Faso</option>
+                                    <option value="BI">Burundi</option>
+                                    <option value="KH">Cambodia</option>
+                                    <option value="CM">Cameroon</option>
+                                    <option value="CA">Canada</option>
+                                    <option value="CV">Cape Verde</option>
+                                    <option value="KY">Cayman Islands</option>
+                                    <option value="CF">Central African Republic</option>
+                                    <option value="TD">Chad</option>
+                                    <option value="CL">Chile</option>
+                                    <option value="CN">China</option>
+                                    <option value="CX">Christmas Island</option>
+                                    <option value="CC">Cocos (Keeling) Islands</option>
+                                    <option value="CO">Colombia</option>
+                                    <option value="KM">Comoros</option>
+                                    <option value="CG">Congo (Brazzaville)</option>
+                                    <option value="CD">Congo (Kinshasa)</option>
+                                    <option value="CK">Cook Islands</option>
+                                    <option value="CR">Costa Rica</option>
+                                    <option value="HR">Croatia</option>
+                                    <option value="CU">Cuba</option>
+                                    <option value="CW">CuraÇao</option>
+                                    <option value="CY">Cyprus</option>
+                                    <option value="CZ">Czech Republic</option>
+                                    <option value="DK">Denmark</option>
+                                    <option value="DJ">Djibouti</option>
+                                    <option value="DM">Dominica</option>
+                                    <option value="DO">Dominican Republic</option>
+                                    <option value="EC">Ecuador</option>
+                                    <option value="EG">Egypt</option>
+                                    <option value="SV">El Salvador</option>
+                                    <option value="GQ">Equatorial Guinea</option>
+                                    <option value="ER">Eritrea</option>
+                                    <option value="EE">Estonia</option>
+                                    <option value="ET">Ethiopia</option>
+                                    <option value="FK">Falkland Islands</option>
+                                    <option value="FO">Faroe Islands</option>
+                                    <option value="FJ">Fiji</option>
+                                    <option value="FI">Finland</option>
+                                    <option value="FR">France</option>
+                                    <option value="GF">French Guiana</option>
+                                    <option value="PF">French Polynesia</option>
+                                    <option value="TF">French Southern Territories</option>
+                                    <option value="GA">Gabon</option>
+                                    <option value="GM">Gambia</option>
+                                    <option value="GE">Georgia</option>
+                                    <option value="DE">Germany</option>
+                                    <option value="GH">Ghana</option>
+                                    <option value="GI">Gibraltar</option>
+                                    <option value="GR">Greece</option>
+                                    <option value="GL">Greenland</option>
+                                    <option value="GD">Grenada</option>
+                                    <option value="GP">Guadeloupe</option>
+                                    <option value="GT">Guatemala</option>
+                                    <option value="GG">Guernsey</option>
+                                    <option value="GN">Guinea</option>
+                                    <option value="GW">Guinea-Bissau</option>
+                                    <option value="GY">Guyana</option>
+                                    <option value="HT">Haiti</option>
+                                    <option value="HM">Heard Island and McDonald Islands</option>
+                                    <option value="HN">Honduras</option>
+                                    <option value="HK">Hong Kong</option>
+                                    <option value="HU">Hungary</option>
+                                    <option value="IS">Iceland</option>
+                                    <option value="IN">India</option>
+                                    <option value="ID">Indonesia</option>
+                                    <option value="IR">Iran</option>
+                                    <option value="IQ">Iraq</option>
+                                    <option value="IM">Isle of Man</option>
+                                    <option value="IL">Israel</option>
+                                    <option value="IT">Italy</option>
+                                    <option value="CI">Ivory Coast</option>
+                                    <option value="JM">Jamaica</option>
+                                    <option value="JP">Japan</option>
+                                    <option value="JE">Jersey</option>
+                                    <option value="JO">Jordan</option>
+                                    <option value="KZ">Kazakhstan</option>
+                                    <option value="KE">Kenya</option>
+                                    <option value="KI">Kiribati</option>
+                                    <option value="KW">Kuwait</option>
+                                    <option value="KG">Kyrgyzstan</option>
+                                    <option value="LA">Laos</option>
+                                    <option value="LV">Latvia</option>
+                                    <option value="LB">Lebanon</option>
+                                    <option value="LS">Lesotho</option>
+                                    <option value="LR">Liberia</option>
+                                    <option value="LY">Libya</option>
+                                    <option value="LI">Liechtenstein</option>
+                                    <option value="LT">Lithuania</option>
+                                    <option value="LU">Luxembourg</option>
+                                    <option value="MO">Macao S.A.R., China</option>
+                                    <option value="MK">Macedonia</option>
+                                    <option value="MG">Madagascar</option>
+                                    <option value="MW">Malawi</option>
+                                    <option value="MY">Malaysia</option>
+                                    <option value="MV">Maldives</option>
+                                    <option value="ML">Mali</option>
+                                    <option value="MT">Malta</option>
+                                    <option value="MH">Marshall Islands</option>
+                                    <option value="MQ">Martinique</option>
+                                    <option value="MR">Mauritania</option>
+                                    <option value="MU">Mauritius</option>
+                                    <option value="YT">Mayotte</option>
+                                    <option value="MX">Mexico</option>
+                                    <option value="FM">Micronesia</option>
+                                    <option value="MD">Moldova</option>
+                                    <option value="MC">Monaco</option>
+                                    <option value="MN">Mongolia</option>
+                                    <option value="ME">Montenegro</option>
+                                    <option value="MS">Montserrat</option>
+                                    <option value="MA">Morocco</option>
+                                    <option value="MZ">Mozambique</option>
+                                    <option value="MM">Myanmar</option>
+                                    <option value="NA">Namibia</option>
+                                    <option value="NR">Nauru</option>
+                                    <option value="NP">Nepal</option>
+                                    <option value="NL">Netherlands</option>
+                                    <option value="AN">Netherlands Antilles</option>
+                                    <option value="NC">New Caledonia</option>
+                                    <option value="NZ">New Zealand</option>
+                                    <option value="NI">Nicaragua</option>
+                                    <option value="NE">Niger</option>
+                                    <option value="NG">Nigeria</option>
+                                    <option value="NU">Niue</option>
+                                    <option value="NF">Norfolk Island</option>
+                                    <option value="KP">North Korea</option>
+                                    <option value="NO">Norway</option>
+                                    <option value="OM">Oman</option>
+                                    <option value="PK">Pakistan</option>
+                                    <option value="PS">Palestinian Territory</option>
+                                    <option value="PA">Panama</option>
+                                    <option value="PG">Papua New Guinea</option>
+                                    <option value="PY">Paraguay</option>
+                                    <option value="PE">Peru</option>
+                                    <option value="PH">Philippines</option>
+                                    <option value="PN">Pitcairn</option>
+                                    <option value="PL">Poland</option>
+                                    <option value="PT">Portugal</option>
+                                    <option value="QA">Qatar</option>
+                                    <option value="IE">Republic of Ireland</option>
+                                    <option value="RE">Reunion</option>
+                                    <option value="RO">Romania</option>
+                                    <option value="RU">Russia</option>
+                                    <option value="RW">Rwanda</option>
+                                    <option value="ST">São Tomé and Príncipe</option>
+                                    <option value="BL">Saint Barthélemy</option>
+                                    <option value="SH">Saint Helena</option>
+                                    <option value="KN">Saint Kitts and Nevis</option>
+                                    <option value="LC">Saint Lucia</option>
+                                    <option value="SX">Saint Martin (Dutch part)</option>
+                                    <option value="MF">Saint Martin (French part)</option>
+                                    <option value="PM">Saint Pierre and Miquelon</option>
+                                    <option value="VC">Saint Vincent and the Grenadines</option>
+                                    <option value="SM">San Marino</option>
+                                    <option value="SA">Saudi Arabia</option>
+                                    <option value="SN">Senegal</option>
+                                    <option value="RS">Serbia</option>
+                                    <option value="SC">Seychelles</option>
+                                    <option value="SL">Sierra Leone</option>
+                                    <option value="SG">Singapore</option>
+                                    <option value="SK">Slovakia</option>
+                                    <option value="SI">Slovenia</option>
+                                    <option value="SB">Solomon Islands</option>
+                                    <option value="SO">Somalia</option>
+                                    <option value="ZA">South Africa</option>
+                                    <option value="GS">South Georgia/Sandwich Islands</option>
+                                    <option value="KR">South Korea</option>
+                                    <option value="SS">South Sudan</option>
+                                    <option value="ES">Spain</option>
+                                    <option value="LK">Sri Lanka</option>
+                                    <option value="SD">Sudan</option>
+                                    <option value="SR">Suriname</option>
+                                    <option value="SJ">Svalbard and Jan Mayen</option>
+                                    <option value="SZ">Swaziland</option>
+                                    <option value="SE">Sweden</option>
+                                    <option value="CH">Switzerland</option>
+                                    <option value="SY">Syria</option>
+                                    <option value="TW">Taiwan</option>
+                                    <option value="TJ">Tajikistan</option>
+                                    <option value="TZ">Tanzania</option>
+                                    <option value="TH">Thailand</option>
+                                    <option value="TL">Timor-Leste</option>
+                                    <option value="TG">Togo</option>
+                                    <option value="TK">Tokelau</option>
+                                    <option value="TO">Tonga</option>
+                                    <option value="TT">Trinidad and Tobago</option>
+                                    <option value="TN">Tunisia</option>
+                                    <option value="TR">Turkey</option>
+                                    <option value="TM">Turkmenistan</option>
+                                    <option value="TC">Turks and Caicos Islands</option>
+                                    <option value="TV">Tuvalu</option>
+                                    <option value="UG">Uganda</option>
+                                    <option value="UA">Ukraine</option>
+                                    <option value="AE">United Arab Emirates</option>
+                                    <option value="GB">United Kingdom (UK)</option>
+                                    <option value="US">USA (US)</option>
+                                    <option value="UY">Uruguay</option>
+                                    <option value="UZ">Uzbekistan</option>
+                                    <option value="VU">Vanuatu</option>
+                                    <option value="VA">Vatican</option>
+                                    <option value="VE">Venezuela</option>
+                                    <option value="VN">Vietnam</option>
+                                    <option value="WF">Wallis and Futuna</option>
+                                    <option value="EH">Western Sahara</option>
+                                    <option value="WS">Western Samoa</option>
+                                    <option value="YE">Yemen</option>
+                                    <option value="ZM">Zambia</option>
+                                    <option value="ZW">Zimbabwe</option>
+                                </select>
+                            </div>
+                        </div> -->
+                        <div class="form-group">
+                            <input type="text" id="addressLine1" name="addressLine1" class="edit-addressline1" placeholder="Address line 1 *" value="">                            
+                            <div class="error text-danger ms-2"></div>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="addressLine2" name="addressLine2" class="edit-addressline2" placeholder="Address line 2" value="">
+                        </div>
+                        <div class="form-group">
+                            <input  type="text" id="city" name="city" class="edit-city" placeholder="City / Town" value="">
+                            <div class="error text-danger ms-2"></div>
+                        </div>
+                        <div class="form-group">
+                            <input  type="text" id="state" name="state" class="edit-state" placeholder="State" value="">
+                            <div class="error text-danger ms-2"></div>
+                        </div>
+                        <div class="form-group">
+                            <input  type="text" id="country" name="country" class="edit-country" placeholder="Country" value="India" value="">
+                            <div class="error text-danger ms-2"></div>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="pincode" name="pincode" class="edit-pincode" placeholder="Pincode *" value="">
+                            <div class="error text-danger ms-2"></div>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="phone" name="phone" class="edit-phone" placeholder="Phone *" value="">
+                            <div class="error text-danger ms-2"></div>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="email" name="email" class="edit-email" placeholder="Email address" value="">
+                            <div class="error text-danger ms-2"></div>
+                        </div>
+                        <div class="mb-20">
+                            <h5>Additional information</h5>
+                        </div>
+                        <div class="form-group mb-30">
+                            <textarea rows="2" id="notes" class="edit-notes" placeholder="Order notes" name="notes"></textarea>
+                        </div>
+                        <div class="form-group mt-3">
+                            <label for="flexSwitchCheckChecked">List</label>
+                            <div class="form-control form-switch">
+                                <input class="form-check-input ms-3 px-5 py-0" type="checkbox" role="switch" name="isDefault" id="flexSwitchCheckChecked">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <input type="hidden" class="form-control edit-id" name="id">
+                        </div>
+                    </div>
+                </form>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
+                    <button id="modal-save-btn" type="submit" onclick="confirmEdit('addAddressForm')" class="btn btn-primary w-50">Add address</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End of Modal for Address Edit -->
+
+    <!-- Modal for Add to Wallet -->
+    <div class="modal fade" id="addToWalletModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Add balance to wallet</h4>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <p id="errMsg" class="m-auto text-center text-danger my-1"><% if (locals.errMsg) { %><%= errMsg %><% } %></p>                        
+                <form name="addToWalletForm" id="addToWalletForm" method="post" action="/user/add-to-wallet">
+                    <div class="modal-body">
+                        <div class="form-group w-100">
+                            <label for="categoryName">Enter Amount</label>
+                            <input class="form-control" id="inputAmount" name="amount" placeholder="Min.₹1  Max.₹99999" value=""/>
+                            <div class="error text-danger ms-2"></div>
+                        </div> 
+                    </div>
+                </form>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
+                    <button id="modal-save-btn" type="submit" onclick="addToWallet()" class="btn btn-primary w-50">Proceed to Payment</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End of Modal for Add to Wallet -->
+    
+    <!-- Footer -->
+    <%- include('./partials/home/home-footer.ejs') %>
+
+    <!-- Preloader Start -->
+    <!-- <%- include('./partials/home/home-preloader.ejs') %>  -->
+
+    <!-- Custom Alert -->
+    <%- include('./partials/home/custom-alert.ejs') %>
+
+    <!-- Vendor JS-->
+    <script src="/assets/js/vendor/modernizr-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="/assets/js/vendor/jquery-migrate-3.3.0.min.js"></script>
+    <script src="/assets/js/vendor/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/plugins/slick.js"></script>
+    <script src="/assets/js/plugins/jquery.syotimer.min.js"></script>
+    <script src="/assets/js/plugins/wow.js"></script>
+    <script src="/assets/js/plugins/jquery-ui.js"></script>
+    <script src="/assets/js/plugins/perfect-scrollbar.js"></script>
+    <script src="/assets/js/plugins/magnific-popup.js"></script>
+    <script src="/assets/js/plugins/select2.min.js"></script>
+    <script src="/assets/js/plugins/waypoints.js"></script>
+    <script src="/assets/js/plugins/counterup.js"></script>
+    <script src="/assets/js/plugins/jquery.countdown.min.js"></script>
+    <script src="/assets/js/plugins/images-loaded.js"></script>
+    <script src="/assets/js/plugins/isotope.js"></script>
+    <script src="/assets/js/plugins/scrollup.js"></script>
+    <script src="/assets/js/plugins/jquery.vticker-min.js"></script>
+    <script src="/assets/js/plugins/jquery.theia.sticky.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js" integrity="sha512-0QbL0ph8Tc8g5bLhfVzSqxe9GERORsKhIn1IrpxDAgUsbBGz/V7iSav2zzW325XGd1OMLdL4UiqRJj702IeqnQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js" integrity="sha512-BkpSL20WETFylMrcirBahHfSnY++H2O1W+UnEEO4yNIl+jI2+zowyoGJpbtk6bx97fBXf++WJHSSK2MV4ghPcg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap4.min.js" integrity="sha512-OQlawZneA7zzfI6B1n1tjUuo3C5mtYuAWpQdg+iI9mkDoo7iFzTqnQHf+K5ThOWNJ9AbXL4+ZDwH7ykySPQc+A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/dataTables.bootstrap4.min.js" integrity="sha512-OQlawZneA7zzfI6B1n1tjUuo3C5mtYuAWpQdg+iI9mkDoo7iFzTqnQHf+K5ThOWNJ9AbXL4+ZDwH7ykySPQc+A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="/assets/js/main.js?v=3.4"></script>  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
+    <script src="https://cdn.datatables.net/plug-ins/1.13.6/sorting/datetime-moment.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="/js/custom-alert.js"></script>
+    <script src="/js/validate-userAddress.js"></script>
+    
+    <!-- Page level custom scripts -->
+    <script>
+        $(document).ready(function() {
+            $('#orderTable').DataTable({
+                order: [[0, 'desc']],
+                columnDefs: [
+                    { "targets": [2,4], "orderable": false },
+                    { "type": "date", "targets":  [0]}
+                ],
+                searching: false,
+                dom: '<"top"i>rt<"bottom"flp>'
+            });
+            $('#walletTable').DataTable({
+                order: [[0, 'desc']],
+                columnDefs: [
+                    { "targets": [3], "orderable": false },
+                    { "type": "date", "targets":  [0]}
+                ],
+                searching: false,
+                dom: '<"top"i>rt<"bottom"flp>'
+            });
+            //$('.nav-tabs a[href="#address"]').tab('show')
+            $('.nav a[href="#<%if(locals.openTab) { %><%= openTab %><% } else { %>dashboard<% } %>"]').tab('show');
+            const openTab = $('.dashboard-menu').data('opentab');
+            console.log(openTab);
+            if(openTab === "wallet"){
+                document.getElementById('add-to-wallet-btn').click(); 
+            }
+        });
+    </script>
+    <!-- Add to Wallet -->
+    <script>
+        function validateAddToWallet(){
+            const amountToAdd = document.getElementById('inputAmount')
+            const amountToAddVal = amountToAdd.value.trim();
+            const amountToAddRegex = /^[0-9]{1,5}$/;
+            setSuccess(amountToAdd);
+
+            if(amountToAddVal === '') {
+                setError(amountToAdd, 'Please enter amount');
+                amountToAdd.focus();
+                return false;
+            } else if(!amountToAddVal.match(amountToAddRegex)){
+                setError(amountToAdd, 'Enter valid amount');
+                amountToAdd.focus();
+                return false;
+            } else if(amountToAddVal < 1){
+                setError(amountToAdd, 'Enter amount greater than ₹1');
+                amountToAdd.focus();
+                return false;
+            } else if(amountToAddVal > 99999){
+                setError(amountToAdd, 'Enter amount less than ₹100000');
+                amountToAdd.focus();
+                return false;
+            }
+            else{
+                setSuccess(amountToAdd);
+            }            
+            return true;
+        }
+        function addToWallet(){
+            console.log('Add to Wallet submit button recorded');
+            if(validateAddToWallet()){
+                console.log("VALIDATION Success");
+                console.log("form fubmitting...");
+                $.ajax({
+                    url:'/user/add-to-wallet',
+                    method:'POST',
+                    data: $("#addToWalletForm").serialize(),
+                    success:(response)=>{
+                        if(response.status){
+                            razorpayPayment(response);
+                        } else{
+                            customAlert("Hey there!", "Cannot add balance to cart right now. Please try again later.")
+                        }
+                    }
+                })
+            } else{
+                console.log("Validation FAILED!");
+            }
+        }
+        function razorpayPayment(data){
+            const user = data.user;
+            const razorpayOrder = data.razorpayOrder;
+            console.log("ANOUNT RAZORPAY : " + razorpayOrder.amount);
+            const options = {
+                "key": "rzp_test_8UfeOJggaoD0lS",
+                "amount": razorpayOrder.amount, 
+                "currency": "INR",
+                "name": "JMJ Music House",
+                "description": "Test Transaction",
+                "image": "//assets/imgs/theme/logo.svg",
+                "order_id": razorpayOrder.id, 
+                "handler": function (response){
+                    verifyWalletPayment(response, razorpayOrder.amount  );
+                },
+                "prefill": {
+                    "name": user?.name,
+                    "email": user?.email,
+                    "contact": user?.phone
+                },
+                "notes": {
+                    "address": "Razorpay Corporate Office"
+                },
+                "theme": {
+                    "color": "#990718"
+                }
+            };
+            console.log(options);
+            console.log(JSON.stringify(options));
+            const rzp1 = new Razorpay(options);
+            rzp1.on('payment.failed', function (response){
+                customAlert("Oops..!", JSON.stringify(error));
+            });
+            rzp1.open();
+        }
+        function verifyWalletPayment(payment, amount){
+            $.ajax({
+                url:'/user/verify-wallet-payment',
+                method: 'post',
+                data:{
+                    payment,
+                    amount
+                },
+                success:(response)=>{
+                    console.log(response);
+                    console.log(JSON.stringify(response));
+
+                    $('#addToWalletModal').modal('hide');
+                    if(response.status){
+                        const data = response.data;        
+                        let transactionHtml = '<span style="font-size: 14px;">';
+                        if(data?.transaction === "C") { 
+                            transactionHtml += 'CREDIT'
+                        } else if (data?.transaction === "D") { 
+                            transactionHtml += 'DEBIT'
+                        }
+                        transactionHtml += '</span>';
+                        //update table
+                        $('#walletTable tbody').prepend(
+                            "<tr><td>" + new Date(data?.timestamp).toLocaleDateString() + " "
+                            + new Date(data?.timestamp).toLocaleTimeString() + "</td><td>₹ " + data?.amount + 
+                            "</td><td>" + transactionHtml + "</td><td>" + data?.remarks + "</td></tr>");
+                        //update wallet balance
+                        let walletBalance = $('#walletBalance').text();
+                        walletBalance = parseInt(walletBalance) + Number(data?.amount) ?? 0;
+                        console.log("walletBalance : " + walletBalance);
+                        $('#walletBalance').text(walletBalance);
+
+                        const openTab = $('.dashboard-menu').data('opentab');
+                        console.log(openTab);
+                        if(openTab === "wallet"){
+                            window.location.href = '/checkout';
+                        } else{
+                            customAlert("Success","Payment SUCCESS! Added money to wallet.");
+                        }                        
+                    } else{
+                        customAlert("Oops..!","Payment failed!" + response.errMsg)
+                    }
+                }
+            });
+        }
+    </script>
+    <!-- Adding & Editing Address -->
+    <script>    
+        function confirmDeleteAddress(formID, name) {
+            if (confirm(`Are you sure to delete the ${name}?`)) {
+                document.getElementById(formID).submit();
+            }
+        }
+        
+        $(document).on( "click", '.edit_address_button',function(e) {
+            const id = $(this).data('id');
+            const customerName = $(this).data('customername');
+            const addressLine1 = $(this).data('addressline1');
+            const addressLine2 = $(this).data('addressline2');
+            const city = $(this).data('city');
+            const state = $(this).data('state');
+            const country = $(this).data('country');
+            const pincode = $(this).data('pincode');
+            const email = $(this).data('email');
+            const phone = $(this).data('phone');
+            const notes = $(this).data('notes');
+            const isDefault = $(this).data('isdefault');
+            console.log(isDefault);
+            $(".edit-id").val(id);
+            $(".edit-customername").val(customerName);
+            $(".edit-addressline1").val(addressLine1);
+            $(".edit-addressline2").val(addressLine2);
+            $(".edit-city").val(city);
+            $(".edit-state").val(state);
+            $(".edit-country").val(country);
+            $(".edit-pincode").val(pincode);
+            $(".edit-email").val(email);
+            $(".edit-phone").val(phone);
+            $(".edit-notes").val(notes);
+            if(isDefault === true)
+                document.getElementById("flexSwitchCheckChecked").setAttribute("checked", "checked");
+        });
+
+        $(document).on( "click", '.add_address_button',function(e) {
+            const id = $(this).data('id');
+            const customerName = $(this).data('customername');
+            const addressLine1 = $(this).data('addressline1');
+            const addressLine2 = $(this).data('addressline2');
+            const city = $(this).data('city');
+            const state = $(this).data('state');
+            const country = $(this).data('country');
+            const pincode = $(this).data('pincode');
+            const email = $(this).data('email');
+            const phone = $(this).data('phone');
+            const notes = $(this).data('notes');
+            const isDefault = $(this).data('isdefault');
+            console.log(isDefault);
+            $(".edit-id").val(id);
+            $(".edit-customername").val(customerName);
+            $(".edit-addressline1").val(addressLine1);
+            $(".edit-addressline2").val(addressLine2);
+            $(".edit-city").val(city);
+            $(".edit-state").val(state);
+            $(".edit-country").val(country);
+            $(".edit-pincode").val(pincode);
+            $(".edit-email").val(email);
+            $(".edit-phone").val(phone);
+            $(".edit-notes").val(notes);
+        });
+        
+        $('#addAddress').on('show.bs.modal', function (event) {
+            let button = $(event.relatedTarget); // Button that triggered the modal
+            let btnAction = button.data('btnaction');
+            console.log("BUTTON ACTION : " + btnAction);
+            let title = button.data('modaltitle');
+            let recipient = button.data('categoryname') || "";             
+            let modal = $(this);
+            modal.find('.modal-title').text(title);
+
+            if( btnAction === "add" ) {  
+                $('#addAddressForm').attr('action', '/user/add-new-address');
+                $('#modal-save-btn').text('Add new Address');
+                document.getElementById("addAddressForm").reset();
+            }
+            else if( btnAction === "edit" ) {
+                $('#addAddressForm').attr('action', '/user/edit-address');
+                $('#modal-save-btn').text('Save changes');
+            }
+            $('#customerName').trigger('focus');
+        });
+    </script>
+    <!-- Resoning cancel & returning -->
+    <script>
+        const reasonModal = document.getElementById('reasonModal')
+        reasonModal.addEventListener('show.bs.modal', function (event) {            
+            const button = event.relatedTarget;
+
+            const title = button.getAttribute('data-bs-title');
+            const action = button.getAttribute('data-bs-route');
+            const orderId = button.getAttribute('data-bs-orderid');
+
+            const modalTitle = reasonModal.querySelector('.modal-title');
+            const prompt = reasonModal.querySelector('.reason-prompt');
+            const orderIdInput = document.getElementById('orderId');
+            
+            modalTitle.textContent = title + ' Order';
+            $('#reasonForm').attr('action', action);
+            prompt.innerHTML = "Are you sure you want to " + title.toLowerCase() + " this order? <br>Please do mention a reason for doing the order.";
+            orderIdInput.value = orderId;
+        })
+    </script>
+</body>
+
+</html>
